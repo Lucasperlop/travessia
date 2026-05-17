@@ -2,11 +2,11 @@
 import { useState, useEffect, useRef } from 'react'
 
 export default function Home() {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState<{role: string, content: string}[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [phase, setPhase] = useState(0)
-  const chatEndRef = useRef(null)
+  const chatEndRef = useRef<HTMLDivElement>(null)
 
   const phases = ['Abertura', 'Infância', 'Dobras', 'Presente', 'Reencontro']
 
@@ -53,31 +53,25 @@ export default function Home() {
   return (
     <main style={{ minHeight: '100vh', background: '#0f0f0f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', padding: '20px' }}>
       <div style={{ width: '100%', maxWidth: '680px', display: 'flex', flexDirection: 'column', height: '90vh' }}>
-
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <h1 style={{ color: '#e8dcc8', fontSize: '28px', fontWeight: '300', letterSpacing: '0.15em', fontStyle: 'italic', margin: 0 }}>Travessia</h1>
-          <p style={{ color: '#666', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '8px' }}>
-            {phases[phase]}
-          </p>
+          <p style={{ color: '#666', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '8px' }}>{phases[phase]}</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '10px' }}>
             {phases.map((_, i) => (
               <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: i === phase ? '#e8dcc8' : i < phase ? '#666' : '#333' }} />
             ))}
           </div>
         </div>
-
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px', paddingRight: '8px' }}>
           {messages.map((msg, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
               <div style={{
-                maxWidth: '80%',
-                padding: '14px 18px',
+                maxWidth: '80%', padding: '14px 18px',
                 borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '4px 18px 18px 18px',
                 background: msg.role === 'user' ? '#1a1a1a' : 'transparent',
                 border: msg.role === 'user' ? '1px solid #333' : 'none',
                 color: msg.role === 'user' ? '#ccc' : '#e8dcc8',
-                fontSize: '15px',
-                lineHeight: '1.7',
+                fontSize: '15px', lineHeight: '1.7',
                 fontStyle: msg.role === 'assistant' ? 'italic' : 'normal'
               }}>
                 {msg.content}
@@ -87,18 +81,17 @@ export default function Home() {
           {loading && (
             <div style={{ display: 'flex', gap: '6px', padding: '14px 4px' }}>
               {[0,1,2].map(i => (
-                <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#666', animation: `pulse 1.2s ease infinite ${i * 0.2}s` }} />
+                <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#666' }} />
               ))}
             </div>
           )}
           <div ref={chatEndRef} />
         </div>
-
         <div style={{ marginTop: '20px', display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
           <textarea
             value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
             placeholder="Escreva aqui com liberdade..."
             rows={2}
             style={{ flex: 1, background: '#1a1a1a', border: '1px solid #333', borderRadius: '12px', padding: '12px 16px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', resize: 'none', outline: 'none' }}
