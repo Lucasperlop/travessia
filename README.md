@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Travessia
 
-## Getting Started
+> *"Quando você perdeu a si mesmo?"*
 
-First, run the development server:
+Travessia é um app conversacional de autoconhecimento guiado por inteligência artificial, baseado nas metodologias de Freud e Jung. Conduz o usuário por 5 fases para revelar quem ele é antes das distrações.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## O que é
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Travessia não é um app de produtividade. Não é meditação. Não é terapia.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+É uma ferramenta que revela quem a pessoa já é por baixo das camadas que a vida foi acumulando.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## As 5 Fases
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Abertura** — acolhimento sem julgamento
+2. **Infância** — acesso a memórias afetivas fundadoras
+3. **Dobras** — momentos em que a pessoa se afastou de si
+4. **Presente** — conexão entre passado e comportamentos atuais
+5. **Reencontro** — espelho devolvido com as próprias palavras do usuário
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Next.js 16 + TypeScript
+- Anthropic API (Claude Sonnet)
+- Supabase (auth + banco de dados)
+- Vercel (deploy)
+- Stripe (pagamentos — em implementação)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Status
+
+MVP em produção: [travessia-six.vercel.app](https://travessia-six.vercel.app)
+
+---
+
+> Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
