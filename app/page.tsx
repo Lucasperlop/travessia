@@ -1,24 +1,58 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const [messages, setMessages] = useState<{role: string, content: string}[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [phase, setPhase] = useState(0)
+  const [conversationId, setConversationId] = useState<string | null>(null)
+  const [nomeChamado, setNomeChamado] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   const phases = ['Abertura', 'Infância', 'Dobras', 'Presente', 'Reencontro']
 
   useEffect(() => {
-    startConversation()
+    checkAuthAndLoad()
   }, [])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  async function startConversation() {
+  async function checkAuthAndLoad() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { router.push('/login'); return }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('nome_chamado')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.nome_chamado) setNomeChamado(profile.nome_chamado)
+
+    const { data: conv } = await supabase
+      .from('conversations')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (conv && conv.messages && conv.messages.length > 0) {
+      setMessages(conv.messages)
+      setPhase(conv.phase || 0)
+      setConversationId(conv.id)
+    } else {
+      startConversation(user.id)
+    }
+  }
+
+  async function startConversation(userId: string) {
     setLoading(true)
     const res = await fetch('/api/chat', {
       method: 'POST',
@@ -28,7 +62,16 @@ export default function Home() {
       })
     })
     const data = await res.json()
-    setMessages([{ role: 'assistant', content: data.message }])
+    const firstMsg = [{ role: 'assistant', content: data.message }]
+    setMessages(firstMsg)
+
+    const { data: conv } = await supabase
+      .from('conversations')
+      .insert({ user_id: userId, messages: firstMsg, phase: 0 })
+      .select()
+      .single()
+
+    if (conv) setConversationId(conv.id)
     setLoading(false)
   }
 
@@ -39,29 +82,52 @@ export default function Home() {
     setMessages(newMessages)
     setInput('')
     setLoading(true)
-    if (newMessages.length % 6 === 0 && phase < 4) setPhase(p => p + 1)
+
+    const newPhase = newMessages.length % 6 === 0 && phase < 4 ? phase + 1 : phase
+    if (newPhase !== phase) setPhase(newPhase)
+
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: newMessages })
     })
     const data = await res.json()
-    setMessages([...newMessages, { role: 'assistant', content: data.message }])
+    const updatedMessages = [...newMessages, { role: 'assistant', content: data.message }]
+    setMessages(updatedMessages)
+
+    if (conversationId) {
+      await supabase
+        .from('conversations')
+        .update({ messages: updatedMessages, phase: newPhase, updated_at: new Date().toISOString() })
+        .eq('id', conversationId)
+    }
+
     setLoading(false)
+  }
+
+  async function sair() {
+    await supabase.auth.signOut()
+    router.push('/login')
   }
 
   return (
     <main style={{ minHeight: '100vh', background: '#0f0f0f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', padding: '20px' }}>
       <div style={{ width: '100%', maxWidth: '680px', display: 'flex', flexDirection: 'column', height: '90vh' }}>
+
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <h1 style={{ color: '#e8dcc8', fontSize: '28px', fontWeight: '300', letterSpacing: '0.15em', fontStyle: 'italic', margin: 0 }}>Travessia</h1>
-          <p style={{ color: '#666', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '8px' }}>{phases[phase]}</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '11px', color: '#444' }}>{nomeChamado || ''}</span>
+            <h1 style={{ color: '#e8dcc8', fontSize: '28px', fontWeight: '300', letterSpacing: '0.15em', fontStyle: 'italic', margin: 0 }}>Travessia</h1>
+            <span onClick={sair} style={{ fontSize: '11px', color: '#444', cursor: 'pointer' }}>sair</span>
+          </div>
+          <p style={{ color: '#666', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{phases[phase]}</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '10px' }}>
             {phases.map((_, i) => (
               <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: i === phase ? '#e8dcc8' : i < phase ? '#666' : '#333' }} />
             ))}
           </div>
         </div>
+
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px', paddingRight: '8px' }}>
           {messages.map((msg, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
@@ -87,6 +153,7 @@ export default function Home() {
           )}
           <div ref={chatEndRef} />
         </div>
+
         <div style={{ marginTop: '20px', display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
           <textarea
             value={input}
