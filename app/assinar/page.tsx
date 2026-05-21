@@ -19,8 +19,13 @@ export default function Assinar() {
       }),
     });
 
-    const { url } = await response.json();
-    window.location.href = url;
+    const data = await response.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      console.error('Erro checkout:', data);
+      setLoading(false);
+    }
   }
 
   return (
