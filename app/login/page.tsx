@@ -28,7 +28,7 @@ export default function Login() {
     }
 
     if (modo === 'cadastrar') {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password: senha,
         options: {
@@ -36,13 +36,31 @@ export default function Login() {
         }
       })
       if (error) { setErro(error.message); setLoading(false); return }
-      setMensagem('Conta criada! Verifique seu email para confirmar e depois faça login.')
+
+      // Se confirmação de email está desabilitada no Supabase,
+      // o usuário já vem logado direto — redireciona para perfil
+      if (data.session) {
+        router.push('/perfil')
+        return
+      }
+
+      // Se confirmação ainda está ativa, mostra mensagem
+      setMensagem('Conta criada! Verifique seu email para confirmar.')
       setLoading(false)
       return
     }
 
+    // LOGIN
     const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
-    if (error) { setErro('Email ou senha incorretos'); setLoading(false); return }
+    if (error) {
+      if (error.message.includes('Email not confirmed')) {
+        setErro('Email ainda não confirmado. Verifique sua caixa de entrada ou use "Esqueci minha senha" para redefinir.')
+      } else {
+        setErro('Email ou senha incorretos.')
+      }
+      setLoading(false)
+      return
+    }
     router.push('/')
     setLoading(false)
   }
