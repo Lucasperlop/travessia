@@ -28,33 +28,27 @@ export default function Login() {
     }
 
     if (modo === 'cadastrar') {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password: senha,
-        options: {
-          emailRedirectTo: 'https://travessia-six.vercel.app/perfil'
-        }
       })
       if (error) { setErro(error.message); setLoading(false); return }
 
-      // Se confirmação de email está desabilitada no Supabase,
-      // o usuário já vem logado direto — redireciona para perfil
-      if (data.session) {
-        router.push('/perfil')
-        return
-      }
-
-      // Se confirmação ainda está ativa, mostra mensagem
-      setMensagem('Conta criada! Verifique seu email para confirmar.')
-      setLoading(false)
+      // Login automático logo após cadastro
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password: senha
+      })
+      if (loginError) { setErro('Conta criada! Agora faça login.'); setLoading(false); return }
+      router.push('/perfil')
       return
     }
 
-    // LOGIN
+    // LOGIN NORMAL
     const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
     if (error) {
       if (error.message.includes('Email not confirmed')) {
-        setErro('Email ainda não confirmado. Verifique sua caixa de entrada ou use "Esqueci minha senha" para redefinir.')
+        setErro('Email não confirmado. Use "Esqueci minha senha" para redefinir e liberar acesso.')
       } else {
         setErro('Email ou senha incorretos.')
       }
