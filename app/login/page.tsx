@@ -19,7 +19,7 @@ export default function Login() {
 
     if (modo === 'resetar') {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://travessia-six.vercel.app/nova-senha'
+        redirectTo: 'https://www.travessiachat.com.br/nova-senha'
       })
       if (error) { setErro('Erro ao enviar email. Tente novamente.'); setLoading(false); return }
       setMensagem('Email enviado! Verifique sua caixa de entrada.')
@@ -63,7 +63,7 @@ export default function Login() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://travessia-six.vercel.app/'
+        redirectTo: 'https://www.travessiachat.com.br/'
       }
     })
   }
