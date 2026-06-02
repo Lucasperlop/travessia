@@ -14,9 +14,7 @@ export default function Login() {
   const router = useRouter()
 
   async function handleSubmit() {
-    setLoading(true)
-    setErro('')
-    setMensagem('')
+    setLoading(true); setErro(''); setMensagem('')
     if (modo === 'resetar') {
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://www.travessiachat.com.br/nova-senha' })
       if (error) { setErro('Erro ao enviar email. Tente novamente.'); setLoading(false); return }
@@ -27,8 +25,7 @@ export default function Login() {
       if (!aceitouTermos) { setErro('Você precisa aceitar a Política de Privacidade para criar uma conta.'); setLoading(false); return }
       const { error } = await supabase.auth.signUp({ email, password: senha })
       if (error) { setErro(error.message); setLoading(false); return }
-      setMensagem('Conta criada! Agora faça login.')
-      setLoading(false); return
+      setMensagem('Conta criada! Verifique seu email para confirmar.'); setLoading(false); return
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
     if (error) {
@@ -36,32 +33,80 @@ export default function Login() {
       else { setErro('Email ou senha incorretos.') }
       setLoading(false); return
     }
-    router.push('/')
-    setLoading(false)
+    router.push('/'); setLoading(false)
   }
 
   async function handleGoogle() {
     await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'https://www.travessiachat.com.br/' } })
   }
 
+  const inputStyle = { width: '100%', background: '#141414', border: '1px solid #1e1e1e', borderRadius: '8px', padding: '13px 16px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' as const, WebkitAppearance: 'none' as const }
+
   return (
     <main style={{ minHeight: '100vh', background: '#0f0f0f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif' }}>
-      <div style={{ width: '100%', maxWidth: '400px', padding: '40px 32px' }}>
-        <h1 style={{ color: '#e8dcc8', fontSize: '28px', fontWeight: '300', fontStyle: 'italic', textAlign: 'center', marginBottom: '8px' }}>Travessia</h1>
-        <p style={{ color: '#666', fontSize: '12px', textAlign: 'center', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '40px' }}>
-          {modo === 'entrar' ? 'Bem-vindo de volta' : modo === 'cadastrar' ? 'Começar a jornada' : 'Recuperar acesso'}
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <input type='email' placeholder='Seu email' value={email} onChange={e => setEmail(e.target.value)} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '12px 16px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', outline: 'none' }} />
-          {modo !== 'resetar' && (<input type='password' placeholder='Senha' value={senha} onChange={e => setSenha(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '12px 16px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', outline: 'none' }} />)}
-          {modo === 'cadastrar' && (<label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}><input type='checkbox' checked={aceitouTermos} onChange={e => setAceitouTermos(e.target.checked)} style={{ marginTop: '2px', accentColor: '#c4aa6a', width: '15px', height: '15px', flexShrink: 0 }} /><span style={{ color: '#888', fontSize: '12px', lineHeight: '1.5' }}>Li e concordo com a <a href='/privacidade' target='_blank' style={{ color: '#c4aa6a', textDecoration: 'underline' }}>Política de Privacidade</a></span></label>)}
-          {erro && <p style={{ color: '#e88', fontSize: '13px', textAlign: 'center' }}>{erro}</p>}
-          {mensagem && <p style={{ color: '#8e8', fontSize: '13px', textAlign: 'center' }}>{mensagem}</p>}
-          <button onClick={handleSubmit} disabled={loading || (modo === 'cadastrar' && !aceitouTermos)} style={{ background: modo === 'cadastrar' && !aceitouTermos ? '#333' : '#e8dcc8', border: 'none', borderRadius: '8px', padding: '14px', color: modo === 'cadastrar' && !aceitouTermos ? '#666' : '#0f0f0f', fontSize: '14px', fontFamily: 'Georgia, serif', cursor: modo === 'cadastrar' && !aceitouTermos ? 'not-allowed' : 'pointer', marginTop: '8px', transition: 'all 0.2s' }}>{loading ? '...' : modo === 'entrar' ? 'Entrar' : modo === 'cadastrar' ? 'Criar conta' : 'Enviar email de recuperação'}</button>
-          {modo === 'entrar' && (<><button onClick={handleGoogle} style={{ background: 'transparent', border: '1px solid #333', borderRadius: '8px', padding: '14px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><span>G</span> Entrar com Google</button><p onClick={() => { setModo('resetar'); setErro(''); setMensagem('') }} style={{ color: '#444', fontSize: '12px', textAlign: 'center', cursor: 'pointer' }}>Esqueci minha senha</p></>)}
-          <p onClick={() => { setModo(modo === 'entrar' ? 'cadastrar' : 'entrar'); setErro(''); setMensagem(''); setAceitouTermos(false) }} style={{ color: '#666', fontSize: '13px', textAlign: 'center', cursor: 'pointer', marginTop: '4px' }}>{modo === 'entrar' ? 'Não tem conta? Cadastrar' : modo === 'cadastrar' ? 'Já tem conta? Entrar' : 'Voltar para o login'}</p>
+      <div style={{ width: '100%', maxWidth: '380px', padding: '48px 32px' }}>
+
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <h1 style={{ color: '#e8dcc8', fontSize: '32px', fontWeight: '300', fontStyle: 'italic', marginBottom: '8px' }}>Travessia</h1>
+          <p style={{ color: '#3a3a3a', fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+            {modo === 'entrar' ? 'Bem-vindo de volta' : modo === 'cadastrar' ? 'Começar a jornada' : 'Recuperar acesso'}
+          </p>
         </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <input type='email' placeholder='Seu email' value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
+
+          {modo !== 'resetar' && (
+            <input type='password' placeholder='Senha' value={senha} onChange={e => setSenha(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} style={inputStyle} />
+          )}
+
+          {modo === 'cadastrar' && (
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', paddingTop: '4px' }}>
+              <input type='checkbox' checked={aceitouTermos} onChange={e => setAceitouTermos(e.target.checked)} style={{ marginTop: '2px', accentColor: '#c4aa6a', width: '14px', height: '14px', flexShrink: 0 }} />
+              <span style={{ color: '#3a3a3a', fontSize: '11px', lineHeight: '1.6' }}>
+                Li e concordo com a{' '}
+                <a href='/privacidade' target='_blank' style={{ color: '#c4aa6a', textDecoration: 'underline' }}>Política de Privacidade</a>
+              </span>
+            </label>
+          )}
+
+          {erro && <p style={{ color: '#b06060', fontSize: '12px', textAlign: 'center', margin: '0' }}>{erro}</p>}
+          {mensagem && <p style={{ color: '#6a9a6a', fontSize: '12px', textAlign: 'center', margin: '0' }}>{mensagem}</p>}
+
+          <button onClick={handleSubmit} disabled={loading || (modo === 'cadastrar' && !aceitouTermos)} style={{ background: modo === 'cadastrar' && !aceitouTermos ? '#1a1a1a' : '#e8dcc8', border: 'none', borderRadius: '8px', padding: '14px', color: modo === 'cadastrar' && !aceitouTermos ? '#333' : '#0f0f0f', fontSize: '13px', fontFamily: 'Georgia, serif', cursor: modo === 'cadastrar' && !aceitouTermos ? 'not-allowed' : 'pointer', marginTop: '4px', letterSpacing: '0.04em' }}>
+            {loading ? '...' : modo === 'entrar' ? 'Entrar' : modo === 'cadastrar' ? 'Criar conta' : 'Enviar email de recuperação'}
+          </button>
+
+          {modo === 'entrar' && (
+            <>
+              <button onClick={handleGoogle} style={{ background: 'transparent', border: '1px solid #1e1e1e', borderRadius: '8px', padding: '13px', color: '#555', fontSize: '13px', fontFamily: 'Georgia, serif', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#444' }}>G</span> Entrar com Google
+              </button>
+              <p onClick={() => { setModo('resetar'); setErro(''); setMensagem('') }} style={{ color: '#2e2e2e', fontSize: '11px', textAlign: 'center', cursor: 'pointer', marginTop: '4px' }}>
+                Esqueci minha senha
+              </p>
+            </>
+          )}
+
+          <p onClick={() => { setModo(modo === 'entrar' ? 'cadastrar' : 'entrar'); setErro(''); setMensagem(''); setAceitouTermos(false) }} style={{ color: '#3a3a3a', fontSize: '12px', textAlign: 'center', cursor: 'pointer', marginTop: '8px' }}>
+            {modo === 'entrar' ? 'Não tem conta? Cadastrar' : modo === 'cadastrar' ? 'Já tem conta? Entrar' : 'Voltar para o login'}
+          </p>
+        </div>
+
+        <p style={{ color: '#1e1e1e', fontSize: '9px', textAlign: 'center', marginTop: '40px', letterSpacing: '0.05em' }}>
+          Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
+        </p>
       </div>
+
+      <style>{`
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+          -webkit-box-shadow: 0 0 0px 1000px #141414 inset !important;
+          -webkit-text-fill-color: #ccc !important;
+          border: 1px solid #1e1e1e !important;
+        }
+      `}</style>
     </main>
   )
 }
