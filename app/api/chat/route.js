@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+﻿import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
 
 const client = new Anthropic({
@@ -27,20 +27,21 @@ REGRAS:
 - Uma pergunta por vez. Sempre.
 - Máximo 3 frases curtas + 1 pergunta
 - Tom íntimo, gentil, como conversa entre amigos em voz baixa
-- Responda sempre em português`;
+- Responda sempre em português
+- Se houver qualquer sinal de crise ou sofrimento agudo: encaminhe gentilmente para o CVV (188)`;
 
 const BLOCOS_DE_MODO = {
   mode_freud: `\n\nMODO ATIVO — EXPLORAR: Conduza a conversa buscando o que está embaixo do comportamento relatado. Use associação livre — perguntas abertas que permitam à pessoa divagar sem julgamento. Identifique mecanismos de fuga e evasão sem nomeá-los clinicamente. Conecte o que a pessoa sente hoje com experiências que moldaram esse padrão. O objetivo é revelar o que a distração está protegendo.`,
   mode_jung: `\n\nMODO ATIVO — INTEGRAR: Conduza a conversa buscando a identidade autêntica por trás das máscaras sociais. Explore o que foi reprimido — a parte que a pessoa esconde inclusive de si mesma. Investigue a distância entre quem ela mostra ser e quem ela sente que é. O objetivo é revelar o núcleo identitário que existe sob as camadas que a vida foi acumulando.`,
   mode_winnicott: `\n\nMODO ATIVO — ORIGEM: Conduza a conversa explorando como a pessoa aprendeu a ser quem é — quais comportamentos foram desenvolvidos para agradar, sobreviver ou ser aceita. Explore a infância e os ambientes que moldaram suas respostas automáticas. O objetivo é revelar a diferença entre quem ela é e quem ela aprendeu a ser para o mundo.`,
-  mode_frankl: `\n\nMODO ATIVO — SENTIDO: Conduza a conversa buscando o que dá ou retirou sentido da vida da pessoa. Explore a sensação de viver no automático como ausência de sentido percebido, não como falha de caráter. Investigue o que ela considera significativo, o que ela evita pensar, para onde ela quer ir. O objetivo é revelar o fio de sentido que existe mas está encoberto.`
+  mode_frankl: `\n\nMODO ATIVO — SENTIDO: Conduza a conversa buscando o que dá ou retirou sentido da vida da pessoa. Explore a sensação de viver no automático como ausência de sentido percebido, não como falha de caráter. Investigue o que ela considera significativo, o que ela evita pensar, para onde ela quer ir. O objetivo é revelar o fio de sentido que existe mas está encoberto.`,
+  mode_12camadas: `\n\nMODO ATIVO — 12 CAMADAS DA PERSONALIDADE: Neste modo, conduza a conversa navegando progressivamente as camadas do caráter da pessoa. Comece pelo que ela apresenta — comportamento, linguagem, hábitos. Desça progressivamente para os padrões de reação, as crenças declaradas, as crenças vividas (que frequentemente divergem das declaradas), os medos que organizam o que ela evita, os desejos que ela não nomeia, a imagem que tem de si mesma, as feridas que moldaram tudo isso, e o núcleo que resta quando tudo é removido. Não nomeie as camadas em voz alta. Conduza o movimento de forma orgânica — uma pergunta de cada vez. O objetivo é revelar o que está atuando abaixo do que a pessoa acredita que a motiva. Nunca diagnostique. Nunca rotule. Nunca use termos clínicos. Se houver sinal de crise: encaminhe gentilmente para o CVV (188).`
 };
 
 export async function POST(request) {
   try {
     const { messages, userId, modo = 'mode_freud' } = await request.json();
 
-    // Buscar perfil do usuário
     const { data: profile } = await supabase
       .from('profiles')
       .select('assinante, mensagens_gratuitas_usadas')
@@ -51,17 +52,14 @@ export async function POST(request) {
       return Response.json({ error: 'Perfil não encontrado' }, { status: 404 });
     }
 
-    // Verificar acesso
     if (!profile.assinante) {
       if (profile.mensagens_gratuitas_usadas >= 10) {
         return Response.json({ paywall: true }, { status: 402 });
       }
     }
 
-    // Montar system prompt com modo
     const systemPromptCompleto = SYSTEM_PROMPT + (BLOCOS_DE_MODO[modo] || BLOCOS_DE_MODO.mode_freud);
 
-    // Chamar Claude
     const response = await client.messages.create({
       model: 'claude-sonnet-4-5',
       max_tokens: 1000,
@@ -69,7 +67,6 @@ export async function POST(request) {
       messages: messages,
     });
 
-    // Incrementar contador se não for assinante
     if (!profile.assinante) {
       await supabase
         .from('profiles')

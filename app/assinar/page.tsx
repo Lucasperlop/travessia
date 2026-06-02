@@ -33,7 +33,7 @@ export default function Assinar() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px', textAlign: 'left' }}>
             {[
-              'Conversas ilimitadas — sem interrupção',
+              'Conversas ilimitadas',
               '4 modos de autoconhecimento desbloqueados',
               '12 Camadas da Personalidade',
               '8 Mapas de Perfil',
