@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -10,62 +10,38 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
   const [mensagem, setMensagem] = useState('')
+  const [aceitouTermos, setAceitouTermos] = useState(false)
   const router = useRouter()
 
   async function handleSubmit() {
     setLoading(true)
     setErro('')
     setMensagem('')
-
     if (modo === 'resetar') {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.travessiachat.com.br/nova-senha'
-      })
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://www.travessiachat.com.br/nova-senha' })
       if (error) { setErro('Erro ao enviar email. Tente novamente.'); setLoading(false); return }
       setMensagem('Email enviado! Verifique sua caixa de entrada.')
-      setLoading(false)
-      return
+      setLoading(false); return
     }
-
     if (modo === 'cadastrar') {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password: senha,
-      })
+      if (!aceitouTermos) { setErro('Você precisa aceitar a Política de Privacidade para criar uma conta.'); setLoading(false); return }
+      const { error } = await supabase.auth.signUp({ email, password: senha })
       if (error) { setErro(error.message); setLoading(false); return }
-
-      // Login automático logo após cadastro
-      const { error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password: senha
-      })
-      if (loginError) { setErro('Conta criada! Agora faça login.'); setLoading(false); return }
-      router.push('/perfil')
-      return
+      setMensagem('Conta criada! Agora faça login.')
+      setLoading(false); return
     }
-
-    // LOGIN NORMAL
     const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
     if (error) {
-      if (error.message.includes('Email not confirmed')) {
-        setErro('Email não confirmado. Use "Esqueci minha senha" para redefinir e liberar acesso.')
-      } else {
-        setErro('Email ou senha incorretos.')
-      }
-      setLoading(false)
-      return
+      if (error.message.includes('Email not confirmed')) { setErro('Confirme seu email antes de entrar. Verifique sua caixa de entrada.') }
+      else { setErro('Email ou senha incorretos.') }
+      setLoading(false); return
     }
     router.push('/')
     setLoading(false)
   }
 
   async function handleGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://www.travessiachat.com.br/'
-      }
-    })
+    await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'https://www.travessiachat.com.br/' } })
   }
 
   return (
@@ -75,58 +51,15 @@ export default function Login() {
         <p style={{ color: '#666', fontSize: '12px', textAlign: 'center', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '40px' }}>
           {modo === 'entrar' ? 'Bem-vindo de volta' : modo === 'cadastrar' ? 'Começar a jornada' : 'Recuperar acesso'}
         </p>
-
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <input
-            type="email"
-            placeholder="Seu email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '12px 16px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', outline: 'none' }}
-          />
-
-          {modo !== 'resetar' && (
-            <input
-              type="password"
-              placeholder="Senha"
-              value={senha}
-              onChange={e => setSenha(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-              style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '12px 16px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', outline: 'none' }}
-            />
-          )}
-
+          <input type='email' placeholder='Seu email' value={email} onChange={e => setEmail(e.target.value)} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '12px 16px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', outline: 'none' }} />
+          {modo !== 'resetar' && (<input type='password' placeholder='Senha' value={senha} onChange={e => setSenha(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '12px 16px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', outline: 'none' }} />)}
+          {modo === 'cadastrar' && (<label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}><input type='checkbox' checked={aceitouTermos} onChange={e => setAceitouTermos(e.target.checked)} style={{ marginTop: '2px', accentColor: '#c4aa6a', width: '15px', height: '15px', flexShrink: 0 }} /><span style={{ color: '#888', fontSize: '12px', lineHeight: '1.5' }}>Li e concordo com a <a href='/privacidade' target='_blank' style={{ color: '#c4aa6a', textDecoration: 'underline' }}>Política de Privacidade</a></span></label>)}
           {erro && <p style={{ color: '#e88', fontSize: '13px', textAlign: 'center' }}>{erro}</p>}
           {mensagem && <p style={{ color: '#8e8', fontSize: '13px', textAlign: 'center' }}>{mensagem}</p>}
-
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            style={{ background: '#e8dcc8', border: 'none', borderRadius: '8px', padding: '14px', color: '#0f0f0f', fontSize: '14px', fontFamily: 'Georgia, serif', cursor: 'pointer', marginTop: '8px' }}>
-            {loading ? '...' : modo === 'entrar' ? 'Entrar' : modo === 'cadastrar' ? 'Criar conta' : 'Enviar email de recuperação'}
-          </button>
-
-          {modo === 'entrar' && (
-            <>
-              <button
-                onClick={handleGoogle}
-                style={{ background: 'transparent', border: '1px solid #333', borderRadius: '8px', padding: '14px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <span>G</span> Entrar com Google
-              </button>
-
-              <p
-                onClick={() => { setModo('resetar'); setErro(''); setMensagem('') }}
-                style={{ color: '#444', fontSize: '12px', textAlign: 'center', cursor: 'pointer' }}>
-                Esqueci minha senha
-              </p>
-            </>
-          )}
-
-          <p
-            onClick={() => { setModo(modo === 'entrar' ? 'cadastrar' : 'entrar'); setErro(''); setMensagem('') }}
-            style={{ color: '#666', fontSize: '13px', textAlign: 'center', cursor: 'pointer', marginTop: '4px' }}>
-            {modo === 'entrar' ? 'Não tem conta? Cadastrar' : modo === 'cadastrar' ? 'Já tem conta? Entrar' : 'Voltar para o login'}
-          </p>
+          <button onClick={handleSubmit} disabled={loading || (modo === 'cadastrar' && !aceitouTermos)} style={{ background: modo === 'cadastrar' && !aceitouTermos ? '#333' : '#e8dcc8', border: 'none', borderRadius: '8px', padding: '14px', color: modo === 'cadastrar' && !aceitouTermos ? '#666' : '#0f0f0f', fontSize: '14px', fontFamily: 'Georgia, serif', cursor: modo === 'cadastrar' && !aceitouTermos ? 'not-allowed' : 'pointer', marginTop: '8px', transition: 'all 0.2s' }}>{loading ? '...' : modo === 'entrar' ? 'Entrar' : modo === 'cadastrar' ? 'Criar conta' : 'Enviar email de recuperação'}</button>
+          {modo === 'entrar' && (<><button onClick={handleGoogle} style={{ background: 'transparent', border: '1px solid #333', borderRadius: '8px', padding: '14px', color: '#ccc', fontSize: '14px', fontFamily: 'Georgia, serif', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><span>G</span> Entrar com Google</button><p onClick={() => { setModo('resetar'); setErro(''); setMensagem('') }} style={{ color: '#444', fontSize: '12px', textAlign: 'center', cursor: 'pointer' }}>Esqueci minha senha</p></>)}
+          <p onClick={() => { setModo(modo === 'entrar' ? 'cadastrar' : 'entrar'); setErro(''); setMensagem(''); setAceitouTermos(false) }} style={{ color: '#666', fontSize: '13px', textAlign: 'center', cursor: 'pointer', marginTop: '4px' }}>{modo === 'entrar' ? 'Não tem conta? Cadastrar' : modo === 'cadastrar' ? 'Já tem conta? Entrar' : 'Voltar para o login'}</p>
         </div>
       </div>
     </main>
