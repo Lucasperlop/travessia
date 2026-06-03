@@ -78,10 +78,10 @@ export async function POST(request: NextRequest) {
     const systemPromptCompleto = SYSTEM_PROMPT + blocoModo;
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5',
       max_tokens: 1000,
       system: systemPromptCompleto,
-      messages: messages,
+      messages: messages.filter((m: {role: string, content: string}) => m.content && m.content.trim() !== ''),
     });
 
     const textBlock = response.content.find((block) => block.type === 'text');
