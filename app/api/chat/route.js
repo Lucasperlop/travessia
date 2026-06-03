@@ -61,7 +61,7 @@ export async function POST(request) {
     const systemPromptCompleto = SYSTEM_PROMPT + (BLOCOS_DE_MODO[modo] || BLOCOS_DE_MODO.mode_freud);
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-5',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       system: systemPromptCompleto,
       messages: messages,
