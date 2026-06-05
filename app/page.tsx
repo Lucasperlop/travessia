@@ -26,7 +26,7 @@ export default function Home() {
     { id: 'mode_jung',      nome: 'Integrar',   descricao: 'Quem você é de verdade',          icone: '∞' },
     { id: 'mode_winnicott', nome: 'Origem',     descricao: 'Como você aprendeu a ser',        icone: '~' },
     { id: 'mode_frankl',    nome: 'Sentido',    descricao: 'Para onde você está indo',        icone: '⊙' },
-    { id: 'mode_12camadas', nome: '12 Camadas', descricao: 'Descubra as camadas da sua personalidade', icone: '◈', locked: true },
+    { id: 'mode_12camadas', nome: '12 Camadas', descricao: 'Sua personalidade fundo a fundo', icone: '◈', locked: true },
   ]
 
   const mapas = [
@@ -156,7 +156,7 @@ export default function Home() {
         <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
           <div style={{ padding: '16px 14px 8px' }}>
             <div className="label-secao" style={{ fontSize: '12px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Conversa</div>
-            <div style={{ fontSize: '12px', color: '#2a2a2a', marginBottom: '10px' }}>Escolha como quer se mover</div>
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>Escolha como quer se mover</div>
             {modos.map(m => (
               <button
                 key={m.id}
@@ -168,14 +168,14 @@ export default function Home() {
                   padding: '8px 0 8px 10px', cursor: 'pointer', textAlign: 'left', marginBottom: '1px',
                 }}
               >
-                <span style={{ fontSize: '15px', color: modo === m.id ? 'var(--accent)' : '#2e2e2e', flexShrink: 0, marginTop: '1px', fontFamily: 'monospace' }}>
+                <span style={{ fontSize: '15px', color: modo === m.id ? 'var(--accent)' : '#666', flexShrink: 0, marginTop: '1px', fontFamily: 'monospace' }}>
                   {m.icone}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="nome-modo" style={{ fontSize: '14px', color: modo === m.id ? 'var(--foreground)' : '#444', fontWeight: modo === m.id ? '600' : '400', fontFamily: 'Georgia, serif' }}>
+                  <div className="nome-modo" style={{ fontSize: '14px', color: modo === m.id ? 'var(--foreground)' : '#888', fontWeight: modo === m.id ? '600' : '400', fontFamily: 'Georgia, serif' }}>
                     {m.nome}
                   </div>
-                  <div className="desc-modo" style={{ fontSize: '12px', color: '#2a2a2a', marginTop: '1px' }}>{m.descricao}</div>
+                  <div className="desc-modo" style={{ fontSize: '12px', color: '#555', marginTop: '1px' }}>{m.descricao}</div>
                 </div>
                 {m.locked && !assinante && <span style={{ fontSize: '13px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
               </button>
@@ -186,17 +186,17 @@ export default function Home() {
 
           <div style={{ padding: '12px 14px 8px' }}>
             <div className="label-secao" style={{ fontSize: '12px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Você se conhece?</div>
-            <div style={{ fontSize: '12px', color: '#2a2a2a', marginBottom: '10px' }}>Cada mapa revela uma camada diferente</div>
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>Cada mapa revela uma camada diferente</div>
             {mapas.map(m => (
               <button
                 key={m.id}
                 onClick={() => { if (!assinante) router.push('/assinar') }}
                 style={{ display: 'flex', alignItems: 'flex-start', gap: '9px', width: '100%', background: 'none', border: 'none', padding: '7px 0 7px 10px', cursor: 'pointer', textAlign: 'left', marginBottom: '1px' }}
               >
-                <span style={{ fontSize: '14px', color: '#2a2a2a', flexShrink: 0, marginTop: '1px' }}>{m.icone}</span>
+                <span style={{ fontSize: '14px', color: '#666', flexShrink: 0, marginTop: '1px' }}>{m.icone}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13px', color: '#3a3a3a', fontFamily: 'Georgia, serif' }}>{m.nome}</div>
-                  <div style={{ fontSize: '11px', color: '#252525', marginTop: '1px' }}>{m.descricao}</div>
+                  <div style={{ fontSize: '13px', color: '#777', fontFamily: 'Georgia, serif' }}>{m.nome}</div>
+                  <div style={{ fontSize: '11px', color: '#555', marginTop: '1px' }}>{m.descricao}</div>
                 </div>
                 {!assinante && <span style={{ fontSize: '13px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
               </button>
@@ -217,17 +217,17 @@ export default function Home() {
 
         {/* Header */}
         <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border-surface)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-          <span onClick={() => setMenuAberto(!menuAberto)} className="menu-hamburguer" style={{ fontSize: '21px', color: '#444', cursor: 'pointer', display: 'none', marginRight: '4px' }}>☰</span>
+          <span onClick={() => setMenuAberto(!menuAberto)} className="menu-hamburguer" style={{ fontSize: '21px', color: '#888', cursor: 'pointer', display: 'none', marginRight: '4px' }}>☰</span>
           <span style={{ fontSize: '18px', color: 'var(--foreground)', fontStyle: 'italic', flex: 1 }}>Conversa</span>
           <span style={{ fontSize: '13px', color: 'var(--background)', background: 'var(--foreground)', padding: '3px 10px', borderRadius: '20px', fontFamily: 'Georgia, serif' }}>
             {modoAtivo?.nome}
           </span>
-          <span style={{ color: '#2a2a2a', fontSize: '17px', cursor: 'pointer' }}>✎</span>
-          <span style={{ color: '#2a2a2a', fontSize: '17px', cursor: 'pointer' }}>◷</span>
+          <span style={{ color: '#666', fontSize: '17px', cursor: 'pointer' }}>✎</span>
+          <span style={{ color: '#666', fontSize: '17px', cursor: 'pointer' }}>◷</span>
         </div>
 
         {/* Fase */}
-        <div style={{ textAlign: 'center', padding: '8px 0 4px', fontSize: '12px', color: '#2a2a2a', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>
+        <div style={{ textAlign: 'center', padding: '8px 0 4px', fontSize: '12px', color: '#666', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>
           {phases[phase]}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '4px', flexShrink: 0 }}>
@@ -240,7 +240,7 @@ export default function Home() {
         <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {messages.map((msg, i) => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start', alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
-              <span style={{ fontSize: '11px', color: '#2e2e2e', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>
+              <span style={{ fontSize: '11px', color: '#666', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>
                 {msg.role === 'user' ? (nomeChamado || 'Você').toUpperCase() : 'TRAVESSIA'}
               </span>
               <div style={{
@@ -266,7 +266,7 @@ export default function Home() {
 
         {/* Input */}
         <div style={{ padding: '0 20px 18px', flexShrink: 0 }}>
-          <p style={{ textAlign: 'center', fontSize: '12px', color: '#222', marginBottom: '8px', letterSpacing: '0.04em' }}>
+          <p style={{ textAlign: 'center', fontSize: '12px', color: '#555', marginBottom: '8px', letterSpacing: '0.04em' }}>
             O Travessia revela, não aconselha · Em crise, ligue 188
           </p>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '12px', padding: '10px 12px' }}>
@@ -317,7 +317,7 @@ export default function Home() {
           .sidebar .status-plano { font-size: 15px !important; }
           .sidebar .label-secao  { font-size: 14px !important; }
           .sidebar .nome-modo    { font-size: 18px !important; }
-          .sidebar .desc-modo    { font-size: 15px !important; color: #555 !important; }
+          .sidebar .desc-modo    { font-size: 15px !important; color: #777 !important; }
         }
 
         @keyframes pulsar {
