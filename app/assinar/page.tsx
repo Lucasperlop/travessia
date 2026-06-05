@@ -24,16 +24,16 @@ export default function Assinar() {
     <main style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', padding: '24px' }}>
       <div style={{ width: '100%', maxWidth: '480px', textAlign: 'center' }}>
 
-        <h1 style={{ color: 'var(--foreground)', fontSize: '28px', fontWeight: '300', fontStyle: 'italic', marginBottom: '8px' }}>
+        <h1 style={{ color: 'var(--foreground)', fontSize: '31px', fontWeight: '300', fontStyle: 'italic', marginBottom: '8px' }}>
           Travessia
         </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '56px' }}>
+        <p style={{ color: '#888', fontSize: '13px', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '56px' }}>
           Acesso completo
         </p>
 
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '12px', padding: '36px 32px', marginBottom: '24px' }}>
 
-          <p style={{ color: 'var(--text-muted)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>
+          <p style={{ color: '#888', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>
             O que você recebe
           </p>
 
@@ -45,17 +45,17 @@ export default function Assinar() {
               '8 Mapas de Perfil',
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                <span style={{ color: 'var(--accent)', fontSize: '12px', marginTop: '1px', flexShrink: 0 }}>·</span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '13px', lineHeight: '1.5' }}>{item}</span>
+                <span style={{ color: 'var(--accent)', fontSize: '15px', marginTop: '1px', flexShrink: 0 }}>·</span>
+                <span style={{ color: '#777', fontSize: '16px', lineHeight: '1.5' }}>{item}</span>
               </div>
             ))}
           </div>
 
           <div style={{ borderTop: '1px solid var(--border-surface)', paddingTop: '24px', marginBottom: '24px' }}>
-            <p style={{ color: 'var(--foreground)', fontSize: '32px', fontWeight: '300', fontStyle: 'italic', marginBottom: '4px' }}>
+            <p style={{ color: 'var(--foreground)', fontSize: '35px', fontWeight: '300', fontStyle: 'italic', marginBottom: '4px' }}>
               R$ 37
             </p>
-            <p style={{ color: 'var(--text-muted)', fontSize: '11px', letterSpacing: '0.06em' }}>
+            <p style={{ color: '#777', fontSize: '14px', letterSpacing: '0.06em' }}>
               por mês
             </p>
           </div>
@@ -63,18 +63,18 @@ export default function Assinar() {
           <button
             onClick={handleAssinar}
             disabled={loading}
-            style={{ width: '100%', background: 'var(--cta-bg)', border: 'none', borderRadius: '8px', padding: '15px', color: 'var(--cta-text)', fontSize: '13px', fontFamily: 'Georgia, serif', cursor: loading ? 'wait' : 'pointer', letterSpacing: '0.04em' }}
+            style={{ width: '100%', background: 'var(--cta-bg)', border: 'none', borderRadius: '8px', padding: '15px', color: 'var(--cta-text)', fontSize: '16px', fontFamily: 'Georgia, serif', cursor: loading ? 'wait' : 'pointer', letterSpacing: '0.04em' }}
           >
             {loading ? 'Redirecionando...' : 'Começar assinatura'}
           </button>
 
         </div>
 
-        <span onClick={() => router.push('/')} style={{ color: 'var(--text-muted)', fontSize: '11px', cursor: 'pointer', letterSpacing: '0.04em' }}>
+        <span onClick={() => router.push('/')} style={{ color: '#777', fontSize: '14px', cursor: 'pointer', letterSpacing: '0.04em' }}>
           ← voltar
         </span>
 
-        <p style={{ color: 'var(--border-surface)', fontSize: '9px', marginTop: '40px', letterSpacing: '0.05em' }}>
+        <p style={{ color: '#555', fontSize: '12px', marginTop: '40px', letterSpacing: '0.05em' }}>
           Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
         </p>
 

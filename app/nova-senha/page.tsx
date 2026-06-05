@@ -59,7 +59,7 @@ export default function NovaSenha() {
 
         <h1 style={{
           color: 'var(--foreground)',
-          fontSize: '24px',
+          fontSize: '27px',
           fontWeight: '300',
           textAlign: 'center',
           letterSpacing: '0.05em',
@@ -67,7 +67,7 @@ export default function NovaSenha() {
           Nova senha
         </h1>
 
-        <p style={{ color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>
+        <p style={{ color: '#888', fontSize: '17px', textAlign: 'center' }}>
           Digite sua nova senha abaixo.
         </p>
 
@@ -82,7 +82,7 @@ export default function NovaSenha() {
             borderRadius: '8px',
             padding: '14px 16px',
             color: 'var(--foreground)',
-            fontSize: '16px',
+            fontSize: '17px',
             outline: 'none',
             width: '100%',
           }}
@@ -99,20 +99,20 @@ export default function NovaSenha() {
             borderRadius: '8px',
             padding: '14px 16px',
             color: 'var(--foreground)',
-            fontSize: '16px',
+            fontSize: '17px',
             outline: 'none',
             width: '100%',
           }}
         />
 
         {erro && (
-          <p style={{ color: 'var(--error)', fontSize: '14px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--error)', fontSize: '17px', textAlign: 'center' }}>
             {erro}
           </p>
         )}
 
         {mensagem && (
-          <p style={{ color: 'var(--foreground)', fontSize: '14px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--foreground)', fontSize: '17px', textAlign: 'center' }}>
             {mensagem}
           </p>
         )}
@@ -126,7 +126,7 @@ export default function NovaSenha() {
             border: 'none',
             borderRadius: '8px',
             padding: '14px',
-            fontSize: '16px',
+            fontSize: '19px',
             fontWeight: '500',
             cursor: carregando ? 'not-allowed' : 'pointer',
             opacity: carregando ? 0.7 : 1,

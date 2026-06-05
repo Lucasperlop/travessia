@@ -49,7 +49,7 @@ export default function Login() {
     borderRadius: '8px',
     padding: '13px 16px',
     color: 'var(--text-secondary)',
-    fontSize: '14px',
+    fontSize: '16px',
     fontFamily: 'Georgia, serif',
     outline: 'none',
     boxSizing: 'border-box' as const,
@@ -65,7 +65,7 @@ export default function Login() {
           <h1 style={{ color: 'var(--foreground)', fontSize: '32px', fontWeight: '300', fontStyle: 'italic', marginBottom: '8px' }}>
             Travessia
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <p style={{ color: '#888', fontSize: '13px', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             {modo === 'entrar' ? 'Bem-vindo de volta' : modo === 'cadastrar' ? 'Começar a jornada' : 'Recuperar acesso'}
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function Login() {
                 onChange={e => setAceitouTermos(e.target.checked)}
                 style={{ marginTop: '2px', accentColor: 'var(--accent)', width: '14px', height: '14px', flexShrink: 0 }}
               />
-              <span style={{ color: 'var(--text-muted)', fontSize: '11px', lineHeight: '1.6' }}>
+              <span style={{ color: '#888', fontSize: '14px', lineHeight: '1.6' }}>
                 Li e concordo com a{' '}
                 <a href='/privacidade' target='_blank' style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
                   Política de Privacidade
@@ -97,20 +97,20 @@ export default function Login() {
           )}
 
           {/* Feedback */}
-          {erro     && <p style={{ color: 'var(--error)',    fontSize: '12px', textAlign: 'center', margin: '0' }}>{erro}</p>}
-          {mensagem && <p style={{ color: 'var(--foreground)', fontSize: '12px', textAlign: 'center', margin: '0' }}>{mensagem}</p>}
+          {erro     && <p style={{ color: 'var(--error)',     fontSize: '14px', textAlign: 'center', margin: '0' }}>{erro}</p>}
+          {mensagem && <p style={{ color: 'var(--foreground)', fontSize: '14px', textAlign: 'center', margin: '0' }}>{mensagem}</p>}
 
           {/* Botão principal */}
           <button
             onClick={handleSubmit}
             disabled={loading || ctaBloqueado}
             style={{
-              background:  ctaBloqueado ? 'var(--bg-hover)'   : 'var(--cta-bg)',
-              color:       ctaBloqueado ? 'var(--text-muted)'  : 'var(--cta-text)',
+              background: ctaBloqueado ? 'var(--bg-hover)' : 'var(--cta-bg)',
+              color:      ctaBloqueado ? '#666'            : 'var(--cta-text)',
               border: 'none',
               borderRadius: '8px',
               padding: '14px',
-              fontSize: '13px',
+              fontSize: '16px',
               fontFamily: 'Georgia, serif',
               cursor: ctaBloqueado ? 'not-allowed' : 'pointer',
               marginTop: '4px',
@@ -130,8 +130,8 @@ export default function Login() {
                   border: '1px solid var(--border-surface)',
                   borderRadius: '8px',
                   padding: '13px',
-                  color: 'var(--text-muted)',
-                  fontSize: '13px',
+                  color: '#888',
+                  fontSize: '16px',
                   fontFamily: 'Georgia, serif',
                   cursor: 'pointer',
                   display: 'flex',
@@ -140,12 +140,12 @@ export default function Login() {
                   gap: '8px',
                 }}
               >
-                <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)' }}>G</span>
+                <span style={{ fontSize: '16px', fontWeight: '600', color: '#888' }}>G</span>
                 Entrar com Google
               </button>
               <p
                 onClick={() => { setModo('resetar'); setErro(''); setMensagem('') }}
-                style={{ color: 'var(--text-muted)', fontSize: '11px', textAlign: 'center', cursor: 'pointer', marginTop: '4px' }}
+                style={{ color: '#777', fontSize: '14px', textAlign: 'center', cursor: 'pointer', marginTop: '4px' }}
               >
                 Esqueci minha senha
               </p>
@@ -155,7 +155,7 @@ export default function Login() {
           {/* Alternar modo */}
           <p
             onClick={() => { setModo(modo === 'entrar' ? 'cadastrar' : 'entrar'); setErro(''); setMensagem(''); setAceitouTermos(false) }}
-            style={{ color: 'var(--text-muted)', fontSize: '12px', textAlign: 'center', cursor: 'pointer', marginTop: '8px' }}
+            style={{ color: '#777', fontSize: '15px', textAlign: 'center', cursor: 'pointer', marginTop: '8px' }}
           >
             {modo === 'entrar' ? 'Não tem conta? Cadastrar' : modo === 'cadastrar' ? 'Já tem conta? Entrar' : 'Voltar para o login'}
           </p>
@@ -163,13 +163,12 @@ export default function Login() {
         </div>
 
         {/* Disclaimer */}
-        <p style={{ color: 'var(--border-surface)', fontSize: '9px', textAlign: 'center', marginTop: '40px', letterSpacing: '0.05em' }}>
+        <p style={{ color: '#555', fontSize: '12px', textAlign: 'center', marginTop: '40px', letterSpacing: '0.05em' }}>
           Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
         </p>
 
       </div>
 
-      {/* Autofill override — usa variáveis CSS */}
       <style>{`
         input:-webkit-autofill,
         input:-webkit-autofill:hover,

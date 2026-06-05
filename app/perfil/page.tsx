@@ -61,7 +61,7 @@ export default function Perfil() {
   }
 
   const labelStyle = {
-    color: 'var(--text-muted)',
+    color: '#888',
     fontSize: '14px',
     marginBottom: '6px',
     display: 'block' as const,
@@ -86,7 +86,7 @@ export default function Perfil() {
           <h1 style={{ color: 'var(--foreground)', fontSize: '31px', fontWeight: '300', fontStyle: 'italic', textAlign: 'center', marginBottom: '8px' }}>
             Travessia
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '40px' }}>
+          <p style={{ color: '#888', fontSize: '13px', textAlign: 'center', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '40px' }}>
             Antes de começar
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -108,7 +108,7 @@ export default function Perfil() {
               style={{
                 background: !nomeChamado ? 'var(--bg-hover)' : 'var(--cta-bg)',
                 border: 'none', borderRadius: '8px', padding: '14px',
-                color: !nomeChamado ? 'var(--text-muted)' : 'var(--cta-text)',
+                color: !nomeChamado ? '#666' : 'var(--cta-text)',
                 fontSize: '16px', fontFamily: 'Georgia, serif',
                 cursor: !nomeChamado ? 'not-allowed' : 'pointer', marginTop: '8px',
               }}
@@ -116,7 +116,7 @@ export default function Perfil() {
               {loading ? '...' : 'Começar minha Travessia'}
             </button>
           </div>
-          <p style={{ color: 'var(--border-surface)', fontSize: '12px', textAlign: 'center', marginTop: '32px', letterSpacing: '0.05em' }}>
+          <p style={{ color: '#555', fontSize: '12px', textAlign: 'center', marginTop: '32px', letterSpacing: '0.05em' }}>
             Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
           </p>
         </div>
@@ -132,7 +132,7 @@ export default function Perfil() {
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px' }}>
-          <span onClick={() => router.push('/')} style={{ color: 'var(--text-muted)', fontSize: '15px', cursor: 'pointer', letterSpacing: '0.04em' }}>← voltar</span>
+          <span onClick={() => router.push('/')} style={{ color: '#888', fontSize: '15px', cursor: 'pointer', letterSpacing: '0.04em' }}>← voltar</span>
           <h1 style={{ color: 'var(--foreground)', fontSize: '23px', fontWeight: '300', fontStyle: 'italic', margin: 0 }}>Travessia</h1>
           <span style={{ width: '48px' }} />
         </div>
@@ -147,7 +147,7 @@ export default function Perfil() {
                 background: 'none', border: 'none',
                 borderBottom: aba === a ? '1px solid var(--accent)' : '1px solid transparent',
                 marginBottom: '-1px', padding: '10px 20px',
-                color: aba === a ? 'var(--foreground)' : 'var(--text-muted)',
+                color: aba === a ? 'var(--foreground)' : '#777',
                 fontSize: '15px', fontFamily: 'Georgia, serif',
                 cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' as const,
               }}
@@ -174,7 +174,7 @@ export default function Perfil() {
             </div>
             <div>
               <label style={labelStyle}>Email</label>
-              <input type="text" value={email} disabled style={{ ...inputStyle, color: 'var(--text-muted)', cursor: 'not-allowed' }} />
+              <input type="text" value={email} disabled style={{ ...inputStyle, color: '#666', cursor: 'not-allowed' }} />
             </div>
             <button
               onClick={salvarPerfil}
@@ -191,11 +191,11 @@ export default function Perfil() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '10px', padding: '20px' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Plano atual</p>
+              <p style={{ color: '#888', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Plano atual</p>
               <p style={{ color: 'var(--foreground)', fontSize: '21px', fontStyle: 'italic', marginBottom: '4px' }}>
                 {assinante ? 'Assinante' : 'Gratuito'}
               </p>
-              <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
+              <p style={{ color: '#777', fontSize: '15px' }}>
                 {assinante ? 'R$ 37/mês · acesso completo' : '10 mensagens gratuitas por conversa'}
               </p>
               {!assinante && (
@@ -210,8 +210,8 @@ export default function Perfil() {
 
             {assinante && (
               <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '10px', padding: '20px' }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Cancelar assinatura</p>
-                <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: '1.6' }}>
+                <p style={{ color: '#888', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Cancelar assinatura</p>
+                <p style={{ color: '#777', fontSize: '15px', lineHeight: '1.6' }}>
                   Para cancelar, envie um email para{' '}
                   <span style={{ color: 'var(--accent)' }}>travessia.chat@gmail.com</span>{' '}
                   com o assunto "Cancelar assinatura". Processamos em até 24h.
@@ -220,8 +220,8 @@ export default function Perfil() {
             )}
 
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '10px', padding: '20px' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Excluir conta</p>
-              <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: '1.6' }}>
+              <p style={{ color: '#888', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Excluir conta</p>
+              <p style={{ color: '#777', fontSize: '15px', lineHeight: '1.6' }}>
                 Para excluir sua conta e todos os seus dados, envie um email para{' '}
                 <span style={{ color: 'var(--accent)' }}>travessia.chat@gmail.com</span>{' '}
                 com o assunto "Excluir minha conta". Processamos em até 30 dias conforme nossa Política de Privacidade.
@@ -229,7 +229,7 @@ export default function Perfil() {
             </div>
 
             <div style={{ borderTop: '1px solid var(--border-surface)', paddingTop: '20px' }}>
-              <button onClick={sair} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '15px', fontFamily: 'Georgia, serif', cursor: 'pointer', padding: '0' }}>
+              <button onClick={sair} style={{ background: 'none', border: 'none', color: '#777', fontSize: '15px', fontFamily: 'Georgia, serif', cursor: 'pointer', padding: '0' }}>
                 Sair da conta
               </button>
             </div>
@@ -237,7 +237,7 @@ export default function Perfil() {
           </div>
         )}
 
-        <p style={{ color: 'var(--border-surface)', fontSize: '12px', textAlign: 'center', marginTop: '48px', letterSpacing: '0.05em' }}>
+        <p style={{ color: '#555', fontSize: '12px', textAlign: 'center', marginTop: '48px', letterSpacing: '0.05em' }}>
           Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
         </p>
 
