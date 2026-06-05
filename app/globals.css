@@ -1,9 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0d0f1a;
-  --foreground: #e8d9a0;
-  --accent: #c4aa6a;
+  /* Fundos */
+  --background:           #0d0f1a;
+  --bg-secondary:         #080a12;
+  --bg-surface:           #141414;
+  --bg-hover:             #1a1f35;
+
+  /* Texto */
+  --foreground:           #e8d9a0;
+  --text-secondary:       #e8e0d0;
+  --text-tertiary:        #c4aa6a;
+  --text-muted:           #666666;
+
+  /* Bordas */
+  --border:               #333333;
+  --border-surface:       #1e1e1e;
+
+  /* Accent */
+  --accent:               #c4aa6a;
+
+  /* Feedback */
+  --error:                #ee8888;
+
+  /* CTA */
+  --cta-bg:               #e8d9a0;
+  --cta-text:             #0d0f1a;
+
+  /* Dots de progresso */
+  --dot-active:           #e8d9a0;
+  --dot-done:             #666666;
+  --dot-inactive:         #333333;
 }
 
 @theme inline {

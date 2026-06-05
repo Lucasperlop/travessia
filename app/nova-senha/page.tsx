@@ -43,30 +43,31 @@ export default function NovaSenha() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#0d0f1a',
+      backgroundColor: 'var(--background)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '24px'
+      padding: '24px',
     }}>
       <div style={{
         width: '100%',
         maxWidth: '400px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '24px'
+        gap: '24px',
       }}>
+
         <h1 style={{
-          color: '#e8d9a0',
+          color: 'var(--foreground)',
           fontSize: '24px',
           fontWeight: '300',
           textAlign: 'center',
-          letterSpacing: '0.05em'
+          letterSpacing: '0.05em',
         }}>
           Nova senha
         </h1>
 
-        <p style={{ color: '#888', fontSize: '14px', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>
           Digite sua nova senha abaixo.
         </p>
 
@@ -76,14 +77,14 @@ export default function NovaSenha() {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           style={{
-            backgroundColor: '#1a1d2e',
-            border: '1px solid #2a2d3e',
+            backgroundColor: 'var(--bg-hover)',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             padding: '14px 16px',
-            color: '#e8d9a0',
+            color: 'var(--foreground)',
             fontSize: '16px',
             outline: 'none',
-            width: '100%'
+            width: '100%',
           }}
         />
 
@@ -93,25 +94,25 @@ export default function NovaSenha() {
           value={confirmar}
           onChange={(e) => setConfirmar(e.target.value)}
           style={{
-            backgroundColor: '#1a1d2e',
-            border: '1px solid #2a2d3e',
+            backgroundColor: 'var(--bg-hover)',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             padding: '14px 16px',
-            color: '#e8d9a0',
+            color: 'var(--foreground)',
             fontSize: '16px',
             outline: 'none',
-            width: '100%'
+            width: '100%',
           }}
         />
 
         {erro && (
-          <p style={{ color: '#ff6b6b', fontSize: '14px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--error)', fontSize: '14px', textAlign: 'center' }}>
             {erro}
           </p>
         )}
 
         {mensagem && (
-          <p style={{ color: '#6bcb77', fontSize: '14px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--foreground)', fontSize: '14px', textAlign: 'center' }}>
             {mensagem}
           </p>
         )}
@@ -120,19 +121,20 @@ export default function NovaSenha() {
           onClick={handleSubmit}
           disabled={carregando}
           style={{
-            backgroundColor: '#c4aa6a',
-            color: '#0d0f1a',
+            backgroundColor: 'var(--cta-bg)',
+            color: 'var(--cta-text)',
             border: 'none',
             borderRadius: '8px',
             padding: '14px',
             fontSize: '16px',
             fontWeight: '500',
             cursor: carregando ? 'not-allowed' : 'pointer',
-            opacity: carregando ? 0.7 : 1
+            opacity: carregando ? 0.7 : 1,
           }}
         >
           {carregando ? 'Atualizando...' : 'Atualizar senha'}
         </button>
+
       </div>
     </div>
   )
