@@ -14,28 +14,30 @@ export default function Home() {
   const [assinante, setAssinante] = useState(false)
   const [modo, setModo] = useState('mode_freud')
   const [menuAberto, setMenuAberto] = useState(false)
+  const [ouvindo, setOuvindo] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
+  const recognitionRef = useRef<any>(null)
   const router = useRouter()
 
   const phases = ['Abertura', 'Infância', 'Dobras', 'Presente', 'Reencontro']
 
   const modos = [
-    { id: 'mode_freud',     nome: 'Explorar',    descricao: 'O que está embaixo',          icone: '≡' },
-    { id: 'mode_jung',      nome: 'Integrar',    descricao: 'Quem você é de verdade',      icone: '∞' },
-    { id: 'mode_winnicott', nome: 'Origem',      descricao: 'Como você aprendeu a ser',    icone: '~' },
-    { id: 'mode_frankl',    nome: 'Sentido',     descricao: 'Para onde você está indo',    icone: '⊙' },
-    { id: 'mode_12camadas', nome: '12 Camadas',  descricao: 'Sua personalidade fundo a fundo', icone: '◈', locked: true },
+    { id: 'mode_freud',     nome: 'Explorar',   descricao: 'O que está embaixo',              icone: '≡' },
+    { id: 'mode_jung',      nome: 'Integrar',   descricao: 'Quem você é de verdade',          icone: '∞' },
+    { id: 'mode_winnicott', nome: 'Origem',     descricao: 'Como você aprendeu a ser',        icone: '~' },
+    { id: 'mode_frankl',    nome: 'Sentido',    descricao: 'Para onde você está indo',        icone: '⊙' },
+    { id: 'mode_12camadas', nome: '12 Camadas', descricao: 'Sua personalidade fundo a fundo', icone: '◈', locked: true },
   ]
 
   const mapas = [
-    { id: 'map_apego',     nome: 'Como você se conecta',      descricao: 'Estilo de vínculo',           icone: '♡' },
-    { id: 'map_tracos',    nome: 'Como você é',               descricao: 'Seus traços mais profundos',  icone: '◯' },
-    { id: 'map_cognitivo', nome: 'Como você pensa',           descricao: 'Seu modo de ver o mundo',     icone: '◎' },
-    { id: 'map_pressao',   nome: 'Como você age sob pressão', descricao: 'Seu padrão de reação',        icone: '△' },
-    { id: 'map_forcas',    nome: 'Suas forças naturais',      descricao: 'O que te move sem esforço',   icone: '✦' },
-    { id: 'map_valores',   nome: 'O que te move',             descricao: 'Seus valores vividos',        icone: '◇' },
-    { id: 'map_ambiente',  nome: 'Onde você floresce',        descricao: 'Seu ambiente ideal',          icone: '⌂' },
-    { id: 'map_vinculo',   nome: 'Como você recebe',          descricao: 'Como percebe afeto',          icone: '❋' },
+    { id: 'map_apego',     nome: 'Como você se conecta',      descricao: 'Estilo de vínculo',          icone: '♡' },
+    { id: 'map_tracos',    nome: 'Como você é',               descricao: 'Seus traços mais profundos', icone: '◯' },
+    { id: 'map_cognitivo', nome: 'Como você pensa',           descricao: 'Seu modo de ver o mundo',    icone: '◎' },
+    { id: 'map_pressao',   nome: 'Como você age sob pressão', descricao: 'Seu padrão de reação',       icone: '△' },
+    { id: 'map_forcas',    nome: 'Suas forças naturais',      descricao: 'O que te move sem esforço',  icone: '✦' },
+    { id: 'map_valores',   nome: 'O que te move',             descricao: 'Seus valores vividos',       icone: '◇' },
+    { id: 'map_ambiente',  nome: 'Onde você floresce',        descricao: 'Seu ambiente ideal',         icone: '⌂' },
+    { id: 'map_vinculo',   nome: 'Como você recebe',          descricao: 'Como percebe afeto',         icone: '❋' },
   ]
 
   useEffect(() => { checkAuthAndLoad() }, [])
@@ -83,6 +85,38 @@ export default function Home() {
     setLoading(false)
   }
 
+  function toggleMicrofone() {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert('Seu navegador não suporta reconhecimento de voz.')
+      return
+    }
+
+    if (ouvindo) {
+      recognitionRef.current?.stop()
+      setOuvindo(false)
+      return
+    }
+
+    const recognition = new SpeechRecognition()
+    recognition.lang = 'pt-BR'
+    recognition.continuous = false
+    recognition.interimResults = false
+
+    recognition.onresult = (event: any) => {
+      const texto = event.results[0][0].transcript
+      setInput(prev => prev ? prev + ' ' + texto : texto)
+      setOuvindo(false)
+    }
+
+    recognition.onerror = () => setOuvindo(false)
+    recognition.onend = () => setOuvindo(false)
+
+    recognitionRef.current = recognition
+    recognition.start()
+    setOuvindo(true)
+  }
+
   function selecionarModo(m: typeof modos[0]) {
     if (m.locked && !assinante) { router.push('/assinar'); return }
     setModo(m.id); setMenuAberto(false)
@@ -97,10 +131,7 @@ export default function Home() {
     <main style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', fontFamily: 'Georgia, serif' }}>
 
       {menuAberto && (
-        <div
-          onClick={() => setMenuAberto(false)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 10 }}
-        />
+        <div onClick={() => setMenuAberto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 10 }} />
       )}
 
       {/* ── SIDEBAR ── */}
@@ -111,34 +142,33 @@ export default function Home() {
           background: '#0d0d0d',
           borderRight: '1px solid var(--border-surface)',
           display: 'flex', flexDirection: 'column',
-          // FIX DO BUG: sidebar ocupa altura total e não scrola como um todo
           position: 'sticky', top: 0,
           height: '100vh',
-          overflow: 'hidden',  // o scroll fica só na área do meio
+          overflow: 'hidden',
           zIndex: 20,
         }}
       >
-        {/* Topo — identidade do usuário */}
+        {/* Topo */}
         <div style={{ padding: '16px 14px', borderBottom: '1px solid var(--border-surface)', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
           <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'var(--bg-surface)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'var(--accent)', fontWeight: '600', flexShrink: 0 }}>
             {iniciais}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: '13px', color: 'var(--foreground)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div className="nome-usuario" style={{ fontSize: '13px', color: 'var(--foreground)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {nomeChamado || 'Você'}
             </div>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>
+            <div className="status-plano" style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>
               {assinante ? 'Assinante' : 'Plano gratuito'}
             </div>
           </div>
           <span onClick={() => router.push('/perfil')} style={{ fontSize: '15px', color: 'var(--text-muted)', cursor: 'pointer', flexShrink: 0 }}>⚙</span>
         </div>
 
-        {/* Meio — lista de modos e mapas, esta área scrola */}
+        {/* Meio — scrola */}
         <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
 
           <div style={{ padding: '16px 14px 8px' }}>
-            <div style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Conversa</div>
+            <div className="label-secao" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Conversa</div>
             <div style={{ fontSize: '9px', color: '#2a2a2a', marginBottom: '10px' }}>Escolha como quer se mover</div>
             {modos.map(m => (
               <button
@@ -155,10 +185,10 @@ export default function Home() {
                   {m.icone}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '11px', color: modo === m.id ? 'var(--foreground)' : '#444', fontWeight: modo === m.id ? '600' : '400', fontFamily: 'Georgia, serif' }}>
+                  <div className="nome-modo" style={{ fontSize: '11px', color: modo === m.id ? 'var(--foreground)' : '#444', fontWeight: modo === m.id ? '600' : '400', fontFamily: 'Georgia, serif' }}>
                     {m.nome}
                   </div>
-                  <div style={{ fontSize: '9px', color: '#2a2a2a', marginTop: '1px' }}>{m.descricao}</div>
+                  <div className="desc-modo" style={{ fontSize: '9px', color: '#2a2a2a', marginTop: '1px' }}>{m.descricao}</div>
                 </div>
                 {m.locked && !assinante && <span style={{ fontSize: '10px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
               </button>
@@ -168,7 +198,7 @@ export default function Home() {
           <div style={{ height: '1px', background: 'var(--border-surface)', margin: '4px 0' }} />
 
           <div style={{ padding: '12px 14px 8px' }}>
-            <div style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Você se conhece?</div>
+            <div className="label-secao" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Você se conhece?</div>
             <div style={{ fontSize: '9px', color: '#2a2a2a', marginBottom: '10px' }}>Cada mapa revela uma camada diferente</div>
             {mapas.map(m => (
               <button
@@ -188,7 +218,7 @@ export default function Home() {
 
         </div>
 
-        {/* Rodapé — botão sair, sempre visível */}
+        {/* Rodapé */}
         <div style={{ padding: '12px 14px', borderTop: '1px solid var(--border-surface)', flexShrink: 0 }}>
           <button onClick={sair} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '10px', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
             Sair
@@ -210,7 +240,7 @@ export default function Home() {
           <span style={{ color: '#2a2a2a', fontSize: '14px', cursor: 'pointer' }}>◷</span>
         </div>
 
-        {/* Indicador de fase */}
+        {/* Fase */}
         <div style={{ textAlign: 'center', padding: '8px 0 4px', fontSize: '9px', color: '#2a2a2a', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           {phases[phase]}
         </div>
@@ -258,10 +288,25 @@ export default function Home() {
               value={input}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
               onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-              placeholder="Escreva aqui com liberdade..."
+              placeholder={ouvindo ? 'Ouvindo...' : 'Escreva aqui com liberdade...'}
               rows={2}
               style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '13px', fontFamily: 'Georgia, serif', resize: 'none', outline: 'none', lineHeight: '1.5' }}
             />
+            {/* Botão microfone */}
+            <button
+              onClick={toggleMicrofone}
+              style={{
+                width: '34px', height: '34px', borderRadius: '50%',
+                background: ouvindo ? 'var(--accent)' : 'transparent',
+                border: `1px solid ${ouvindo ? 'var(--accent)' : 'var(--border)'}`,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '16px', flexShrink: 0,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              🎙️
+            </button>
+            {/* Botão enviar */}
             <button
               onClick={sendMessage}
               disabled={loading}
@@ -273,16 +318,32 @@ export default function Home() {
 
       <style>{`
         .sidebar { transition: transform 0.3s ease; }
+
         @media (max-width: 768px) {
           .sidebar {
             position: fixed !important;
             top: 0; left: 0;
+            width: 100vw !important;
+            min-width: 100vw !important;
             height: 100vh;
             transform: translateX(-100%);
           }
           .sidebar.sidebar-open { transform: translateX(0); }
           .menu-hamburguer { display: block !important; }
+
+          /* Textos maiores no mobile */
+          .sidebar .nome-usuario  { font-size: 15px !important; }
+          .sidebar .status-plano  { font-size: 12px !important; }
+          .sidebar .label-secao   { font-size: 11px !important; }
+          .sidebar .nome-modo     { font-size: 15px !important; }
+          .sidebar .desc-modo     { font-size: 12px !important; color: #555 !important; }
         }
+
+        @keyframes pulsar {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.1); }
+        }
+        .mic-ativo { animation: pulsar 1s ease-in-out infinite; }
       `}</style>
     </main>
   )
