@@ -26,7 +26,7 @@ export default function Home() {
     { id: 'mode_jung',      nome: 'Integrar',   descricao: 'Quem você é de verdade',          icone: '∞' },
     { id: 'mode_winnicott', nome: 'Origem',     descricao: 'Como você aprendeu a ser',        icone: '~' },
     { id: 'mode_frankl',    nome: 'Sentido',    descricao: 'Para onde você está indo',        icone: '⊙' },
-    { id: 'mode_12camadas', nome: '12 Camadas', descricao: 'Sua personalidade fundo a fundo', icone: '◈', locked: true },
+    { id: 'mode_12camadas', nome: '12 Camadas', descricao: 'Descubra as camadas da sua personalidade', icone: '◈', locked: true },
   ]
 
   const mapas = [
