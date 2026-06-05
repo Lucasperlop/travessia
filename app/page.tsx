@@ -126,7 +126,7 @@ export default function Home() {
       <div
         className={`sidebar ${menuAberto ? 'sidebar-open' : ''}`}
         style={{
-          width: '210px', minWidth: '210px',
+          width: '220px', minWidth: '220px',
           background: '#0d0d0d',
           borderRight: '1px solid var(--border-surface)',
           display: 'flex', flexDirection: 'column',
@@ -138,25 +138,25 @@ export default function Home() {
       >
         {/* Topo */}
         <div style={{ padding: '16px 14px', borderBottom: '1px solid var(--border-surface)', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'var(--bg-surface)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'var(--accent)', fontWeight: '600', flexShrink: 0 }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-surface)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: 'var(--accent)', fontWeight: '600', flexShrink: 0 }}>
             {iniciais}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="nome-usuario" style={{ fontSize: '13px', color: 'var(--foreground)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div className="nome-usuario" style={{ fontSize: '16px', color: 'var(--foreground)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {nomeChamado || 'Você'}
             </div>
-            <div className="status-plano" style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>
+            <div className="status-plano" style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
               {assinante ? 'Assinante' : 'Plano gratuito'}
             </div>
           </div>
-          <span onClick={() => router.push('/perfil')} style={{ fontSize: '15px', color: 'var(--text-muted)', cursor: 'pointer', flexShrink: 0 }}>⚙</span>
+          <span onClick={() => router.push('/perfil')} style={{ fontSize: '18px', color: 'var(--text-muted)', cursor: 'pointer', flexShrink: 0 }}>⚙</span>
         </div>
 
         {/* Meio — scrola */}
         <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
           <div style={{ padding: '16px 14px 8px' }}>
-            <div className="label-secao" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Conversa</div>
-            <div style={{ fontSize: '9px', color: '#2a2a2a', marginBottom: '10px' }}>Escolha como quer se mover</div>
+            <div className="label-secao" style={{ fontSize: '12px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Conversa</div>
+            <div style={{ fontSize: '12px', color: '#2a2a2a', marginBottom: '10px' }}>Escolha como quer se mover</div>
             {modos.map(m => (
               <button
                 key={m.id}
@@ -165,19 +165,19 @@ export default function Home() {
                   display: 'flex', alignItems: 'flex-start', gap: '9px',
                   width: '100%', background: 'none', border: 'none',
                   borderLeft: modo === m.id ? '2px solid var(--accent)' : '2px solid transparent',
-                  padding: '7px 0 7px 10px', cursor: 'pointer', textAlign: 'left', marginBottom: '1px',
+                  padding: '8px 0 8px 10px', cursor: 'pointer', textAlign: 'left', marginBottom: '1px',
                 }}
               >
-                <span style={{ fontSize: '12px', color: modo === m.id ? 'var(--accent)' : '#2e2e2e', flexShrink: 0, marginTop: '1px', fontFamily: 'monospace' }}>
+                <span style={{ fontSize: '15px', color: modo === m.id ? 'var(--accent)' : '#2e2e2e', flexShrink: 0, marginTop: '1px', fontFamily: 'monospace' }}>
                   {m.icone}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="nome-modo" style={{ fontSize: '11px', color: modo === m.id ? 'var(--foreground)' : '#444', fontWeight: modo === m.id ? '600' : '400', fontFamily: 'Georgia, serif' }}>
+                  <div className="nome-modo" style={{ fontSize: '14px', color: modo === m.id ? 'var(--foreground)' : '#444', fontWeight: modo === m.id ? '600' : '400', fontFamily: 'Georgia, serif' }}>
                     {m.nome}
                   </div>
-                  <div className="desc-modo" style={{ fontSize: '9px', color: '#2a2a2a', marginTop: '1px' }}>{m.descricao}</div>
+                  <div className="desc-modo" style={{ fontSize: '12px', color: '#2a2a2a', marginTop: '1px' }}>{m.descricao}</div>
                 </div>
-                {m.locked && !assinante && <span style={{ fontSize: '10px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
+                {m.locked && !assinante && <span style={{ fontSize: '13px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
               </button>
             ))}
           </div>
@@ -185,20 +185,20 @@ export default function Home() {
           <div style={{ height: '1px', background: 'var(--border-surface)', margin: '4px 0' }} />
 
           <div style={{ padding: '12px 14px 8px' }}>
-            <div className="label-secao" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Você se conhece?</div>
-            <div style={{ fontSize: '9px', color: '#2a2a2a', marginBottom: '10px' }}>Cada mapa revela uma camada diferente</div>
+            <div className="label-secao" style={{ fontSize: '12px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Você se conhece?</div>
+            <div style={{ fontSize: '12px', color: '#2a2a2a', marginBottom: '10px' }}>Cada mapa revela uma camada diferente</div>
             {mapas.map(m => (
               <button
                 key={m.id}
                 onClick={() => { if (!assinante) router.push('/assinar') }}
-                style={{ display: 'flex', alignItems: 'flex-start', gap: '9px', width: '100%', background: 'none', border: 'none', padding: '6px 0 6px 10px', cursor: 'pointer', textAlign: 'left', marginBottom: '1px' }}
+                style={{ display: 'flex', alignItems: 'flex-start', gap: '9px', width: '100%', background: 'none', border: 'none', padding: '7px 0 7px 10px', cursor: 'pointer', textAlign: 'left', marginBottom: '1px' }}
               >
-                <span style={{ fontSize: '11px', color: '#2a2a2a', flexShrink: 0, marginTop: '1px' }}>{m.icone}</span>
+                <span style={{ fontSize: '14px', color: '#2a2a2a', flexShrink: 0, marginTop: '1px' }}>{m.icone}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '10px', color: '#3a3a3a', fontFamily: 'Georgia, serif' }}>{m.nome}</div>
-                  <div style={{ fontSize: '8px', color: '#252525', marginTop: '1px' }}>{m.descricao}</div>
+                  <div style={{ fontSize: '13px', color: '#3a3a3a', fontFamily: 'Georgia, serif' }}>{m.nome}</div>
+                  <div style={{ fontSize: '11px', color: '#252525', marginTop: '1px' }}>{m.descricao}</div>
                 </div>
-                {!assinante && <span style={{ fontSize: '10px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
+                {!assinante && <span style={{ fontSize: '13px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
               </button>
             ))}
           </div>
@@ -206,7 +206,7 @@ export default function Home() {
 
         {/* Rodapé */}
         <div style={{ padding: '12px 14px', borderTop: '1px solid var(--border-surface)', flexShrink: 0 }}>
-          <button onClick={sair} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '10px', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
+          <button onClick={sair} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '13px', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
             Sair
           </button>
         </div>
@@ -215,19 +215,19 @@ export default function Home() {
       {/* ── ÁREA PRINCIPAL ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
 
-        {/* Header — fixo no topo */}
+        {/* Header */}
         <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border-surface)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-          <span onClick={() => setMenuAberto(!menuAberto)} className="menu-hamburguer" style={{ fontSize: '18px', color: '#444', cursor: 'pointer', display: 'none', marginRight: '4px' }}>☰</span>
-          <span style={{ fontSize: '15px', color: 'var(--foreground)', fontStyle: 'italic', flex: 1 }}>Conversa</span>
-          <span style={{ fontSize: '10px', color: 'var(--background)', background: 'var(--foreground)', padding: '3px 10px', borderRadius: '20px', fontFamily: 'Georgia, serif' }}>
+          <span onClick={() => setMenuAberto(!menuAberto)} className="menu-hamburguer" style={{ fontSize: '21px', color: '#444', cursor: 'pointer', display: 'none', marginRight: '4px' }}>☰</span>
+          <span style={{ fontSize: '18px', color: 'var(--foreground)', fontStyle: 'italic', flex: 1 }}>Conversa</span>
+          <span style={{ fontSize: '13px', color: 'var(--background)', background: 'var(--foreground)', padding: '3px 10px', borderRadius: '20px', fontFamily: 'Georgia, serif' }}>
             {modoAtivo?.nome}
           </span>
-          <span style={{ color: '#2a2a2a', fontSize: '14px', cursor: 'pointer' }}>✎</span>
-          <span style={{ color: '#2a2a2a', fontSize: '14px', cursor: 'pointer' }}>◷</span>
+          <span style={{ color: '#2a2a2a', fontSize: '17px', cursor: 'pointer' }}>✎</span>
+          <span style={{ color: '#2a2a2a', fontSize: '17px', cursor: 'pointer' }}>◷</span>
         </div>
 
-        {/* Fase — fixa */}
-        <div style={{ textAlign: 'center', padding: '8px 0 4px', fontSize: '9px', color: '#2a2a2a', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>
+        {/* Fase */}
+        <div style={{ textAlign: 'center', padding: '8px 0 4px', fontSize: '12px', color: '#2a2a2a', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>
           {phases[phase]}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '4px', flexShrink: 0 }}>
@@ -236,11 +236,11 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Mensagens — única área que scrola */}
+        {/* Mensagens */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {messages.map((msg, i) => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start', alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
-              <span style={{ fontSize: '8px', color: '#2e2e2e', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>
+              <span style={{ fontSize: '11px', color: '#2e2e2e', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>
                 {msg.role === 'user' ? (nomeChamado || 'Você').toUpperCase() : 'TRAVESSIA'}
               </span>
               <div style={{
@@ -249,7 +249,7 @@ export default function Home() {
                 background: msg.role === 'user' ? 'var(--bg-secondary)' : 'var(--bg-surface)',
                 border: '1px solid var(--border-surface)',
                 color: msg.role === 'user' ? 'var(--text-secondary)' : 'var(--foreground)',
-                fontSize: '14px', lineHeight: '1.65',
+                fontSize: '17px', lineHeight: '1.65',
                 fontStyle: msg.role === 'assistant' ? 'italic' : 'normal',
               }}>
                 {msg.content}
@@ -264,9 +264,9 @@ export default function Home() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input — fixo no rodapé */}
+        {/* Input */}
         <div style={{ padding: '0 20px 18px', flexShrink: 0 }}>
-          <p style={{ textAlign: 'center', fontSize: '9px', color: '#222', marginBottom: '8px', letterSpacing: '0.04em' }}>
+          <p style={{ textAlign: 'center', fontSize: '12px', color: '#222', marginBottom: '8px', letterSpacing: '0.04em' }}>
             O Travessia revela, não aconselha · Em crise, ligue 188
           </p>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '12px', padding: '10px 12px' }}>
@@ -276,23 +276,23 @@ export default function Home() {
               onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
               placeholder={ouvindo ? 'Ouvindo...' : 'Escreva aqui com liberdade...'}
               rows={2}
-              style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '13px', fontFamily: 'Georgia, serif', resize: 'none', outline: 'none', lineHeight: '1.5' }}
+              style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '16px', fontFamily: 'Georgia, serif', resize: 'none', outline: 'none', lineHeight: '1.5' }}
             />
             <button
               onClick={toggleMicrofone}
               style={{
-                width: '34px', height: '34px', borderRadius: '50%',
+                width: '36px', height: '36px', borderRadius: '50%',
                 background: ouvindo ? 'var(--accent)' : 'transparent',
                 border: `1px solid ${ouvindo ? 'var(--accent)' : 'var(--border)'}`,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '16px', flexShrink: 0,
+                fontSize: '17px', flexShrink: 0,
                 transition: 'all 0.2s ease',
               }}
             >🎙️</button>
             <button
               onClick={sendMessage}
               disabled={loading}
-              style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'var(--cta-bg)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', color: 'var(--cta-text)', flexShrink: 0 }}
+              style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--cta-bg)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', color: 'var(--cta-text)', flexShrink: 0 }}
             >↑</button>
           </div>
         </div>
@@ -313,11 +313,11 @@ export default function Home() {
           .sidebar.sidebar-open { transform: translateX(0); }
           .menu-hamburguer { display: block !important; }
 
-          .sidebar .nome-usuario { font-size: 15px !important; }
-          .sidebar .status-plano { font-size: 12px !important; }
-          .sidebar .label-secao  { font-size: 11px !important; }
-          .sidebar .nome-modo    { font-size: 15px !important; }
-          .sidebar .desc-modo    { font-size: 12px !important; color: #555 !important; }
+          .sidebar .nome-usuario { font-size: 18px !important; }
+          .sidebar .status-plano { font-size: 15px !important; }
+          .sidebar .label-secao  { font-size: 14px !important; }
+          .sidebar .nome-modo    { font-size: 18px !important; }
+          .sidebar .desc-modo    { font-size: 15px !important; color: #555 !important; }
         }
 
         @keyframes pulsar {

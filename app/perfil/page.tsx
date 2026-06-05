@@ -54,7 +54,7 @@ export default function Perfil() {
     borderRadius: '8px',
     padding: '12px 16px',
     color: 'var(--text-secondary)',
-    fontSize: '14px',
+    fontSize: '17px',
     fontFamily: 'Georgia, serif',
     outline: 'none',
     boxSizing: 'border-box' as const,
@@ -62,7 +62,7 @@ export default function Perfil() {
 
   const labelStyle = {
     color: 'var(--text-muted)',
-    fontSize: '11px',
+    fontSize: '14px',
     marginBottom: '6px',
     display: 'block' as const,
     letterSpacing: '0.04em',
@@ -78,19 +78,17 @@ export default function Perfil() {
     }
   `
 
-  // ── PRIMEIRO ACESSO ──────────────────────────────────────────
+  // ── PRIMEIRO ACESSO ──
   if (primeiroAcesso && !nomeChamado) {
     return (
       <main style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif' }}>
         <div style={{ width: '100%', maxWidth: '380px', padding: '48px 32px' }}>
-
-          <h1 style={{ color: 'var(--foreground)', fontSize: '28px', fontWeight: '300', fontStyle: 'italic', textAlign: 'center', marginBottom: '8px' }}>
+          <h1 style={{ color: 'var(--foreground)', fontSize: '31px', fontWeight: '300', fontStyle: 'italic', textAlign: 'center', marginBottom: '8px' }}>
             Travessia
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '10px', textAlign: 'center', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '40px' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '40px' }}>
             Antes de começar
           </p>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label style={labelStyle}>Como gostaria de ser chamado?</label>
@@ -104,27 +102,21 @@ export default function Perfil() {
               <label style={labelStyle}>Data de nascimento</label>
               <input type="date" value={nascimento} onChange={e => setNascimento(e.target.value)} style={inputStyle} />
             </div>
-
             <button
               onClick={salvarPerfil}
               disabled={loading || !nomeChamado}
               style={{
                 background: !nomeChamado ? 'var(--bg-hover)' : 'var(--cta-bg)',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '14px',
+                border: 'none', borderRadius: '8px', padding: '14px',
                 color: !nomeChamado ? 'var(--text-muted)' : 'var(--cta-text)',
-                fontSize: '13px',
-                fontFamily: 'Georgia, serif',
-                cursor: !nomeChamado ? 'not-allowed' : 'pointer',
-                marginTop: '8px',
+                fontSize: '16px', fontFamily: 'Georgia, serif',
+                cursor: !nomeChamado ? 'not-allowed' : 'pointer', marginTop: '8px',
               }}
             >
               {loading ? '...' : 'Começar minha Travessia'}
             </button>
           </div>
-
-          <p style={{ color: 'var(--border-surface)', fontSize: '9px', textAlign: 'center', marginTop: '32px', letterSpacing: '0.05em' }}>
+          <p style={{ color: 'var(--border-surface)', fontSize: '12px', textAlign: 'center', marginTop: '32px', letterSpacing: '0.05em' }}>
             Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
           </p>
         </div>
@@ -133,15 +125,15 @@ export default function Perfil() {
     )
   }
 
-  // ── PERFIL COMPLETO ──────────────────────────────────────────
+  // ── PERFIL COMPLETO ──
   return (
     <main style={{ minHeight: '100vh', background: 'var(--background)', fontFamily: 'Georgia, serif' }}>
       <div style={{ maxWidth: '560px', margin: '0 auto', padding: '40px 24px' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px' }}>
-          <span onClick={() => router.push('/')} style={{ color: 'var(--text-muted)', fontSize: '12px', cursor: 'pointer', letterSpacing: '0.04em' }}>← voltar</span>
-          <h1 style={{ color: 'var(--foreground)', fontSize: '20px', fontWeight: '300', fontStyle: 'italic', margin: 0 }}>Travessia</h1>
+          <span onClick={() => router.push('/')} style={{ color: 'var(--text-muted)', fontSize: '15px', cursor: 'pointer', letterSpacing: '0.04em' }}>← voltar</span>
+          <h1 style={{ color: 'var(--foreground)', fontSize: '23px', fontWeight: '300', fontStyle: 'italic', margin: 0 }}>Travessia</h1>
           <span style={{ width: '48px' }} />
         </div>
 
@@ -152,17 +144,12 @@ export default function Perfil() {
               key={a}
               onClick={() => setAba(a)}
               style={{
-                background: 'none',
-                border: 'none',
+                background: 'none', border: 'none',
                 borderBottom: aba === a ? '1px solid var(--accent)' : '1px solid transparent',
-                marginBottom: '-1px',
-                padding: '10px 20px',
+                marginBottom: '-1px', padding: '10px 20px',
                 color: aba === a ? 'var(--foreground)' : 'var(--text-muted)',
-                fontSize: '12px',
-                fontFamily: 'Georgia, serif',
-                cursor: 'pointer',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase' as const,
+                fontSize: '15px', fontFamily: 'Georgia, serif',
+                cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' as const,
               }}
             >
               {a === 'perfil' ? 'Perfil' : 'Conta'}
@@ -192,17 +179,7 @@ export default function Perfil() {
             <button
               onClick={salvarPerfil}
               disabled={loading || !nomeChamado}
-              style={{
-                background: 'var(--cta-bg)',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '13px',
-                color: 'var(--cta-text)',
-                fontSize: '13px',
-                fontFamily: 'Georgia, serif',
-                cursor: 'pointer',
-                marginTop: '8px',
-              }}
+              style={{ background: 'var(--cta-bg)', border: 'none', borderRadius: '8px', padding: '13px', color: 'var(--cta-text)', fontSize: '16px', fontFamily: 'Georgia, serif', cursor: 'pointer', marginTop: '8px' }}
             >
               {loading ? '...' : salvou ? 'Salvo!' : 'Salvar alterações'}
             </button>
@@ -213,30 +190,28 @@ export default function Perfil() {
         {aba === 'conta' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-            {/* Plano */}
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '10px', padding: '20px' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Plano atual</p>
-              <p style={{ color: 'var(--foreground)', fontSize: '18px', fontStyle: 'italic', marginBottom: '4px' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Plano atual</p>
+              <p style={{ color: 'var(--foreground)', fontSize: '21px', fontStyle: 'italic', marginBottom: '4px' }}>
                 {assinante ? 'Assinante' : 'Gratuito'}
               </p>
-              <p style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
                 {assinante ? 'R$ 37/mês · acesso completo' : '10 mensagens gratuitas por conversa'}
               </p>
               {!assinante && (
                 <button
                   onClick={() => router.push('/assinar')}
-                  style={{ marginTop: '16px', background: 'var(--cta-bg)', border: 'none', borderRadius: '8px', padding: '11px 20px', color: 'var(--cta-text)', fontSize: '12px', fontFamily: 'Georgia, serif', cursor: 'pointer' }}
+                  style={{ marginTop: '16px', background: 'var(--cta-bg)', border: 'none', borderRadius: '8px', padding: '11px 20px', color: 'var(--cta-text)', fontSize: '15px', fontFamily: 'Georgia, serif', cursor: 'pointer' }}
                 >
                   Assinar — R$ 37/mês
                 </button>
               )}
             </div>
 
-            {/* Cancelar assinatura */}
             {assinante && (
               <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '10px', padding: '20px' }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Cancelar assinatura</p>
-                <p style={{ color: 'var(--text-muted)', fontSize: '12px', lineHeight: '1.6', marginBottom: '16px' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Cancelar assinatura</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: '1.6' }}>
                   Para cancelar, envie um email para{' '}
                   <span style={{ color: 'var(--accent)' }}>travessia.chat@gmail.com</span>{' '}
                   com o assunto "Cancelar assinatura". Processamos em até 24h.
@@ -244,19 +219,17 @@ export default function Perfil() {
               </div>
             )}
 
-            {/* Excluir conta */}
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '10px', padding: '20px' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Excluir conta</p>
-              <p style={{ color: 'var(--text-muted)', fontSize: '12px', lineHeight: '1.6' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>Excluir conta</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: '1.6' }}>
                 Para excluir sua conta e todos os seus dados, envie um email para{' '}
                 <span style={{ color: 'var(--accent)' }}>travessia.chat@gmail.com</span>{' '}
                 com o assunto "Excluir minha conta". Processamos em até 30 dias conforme nossa Política de Privacidade.
               </p>
             </div>
 
-            {/* Sair */}
             <div style={{ borderTop: '1px solid var(--border-surface)', paddingTop: '20px' }}>
-              <button onClick={sair} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '12px', fontFamily: 'Georgia, serif', cursor: 'pointer', padding: '0' }}>
+              <button onClick={sair} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '15px', fontFamily: 'Georgia, serif', cursor: 'pointer', padding: '0' }}>
                 Sair da conta
               </button>
             </div>
@@ -264,8 +237,7 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* Disclaimer */}
-        <p style={{ color: 'var(--border-surface)', fontSize: '9px', textAlign: 'center', marginTop: '48px', letterSpacing: '0.05em' }}>
+        <p style={{ color: 'var(--border-surface)', fontSize: '12px', textAlign: 'center', marginTop: '48px', letterSpacing: '0.05em' }}>
           Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
         </p>
 
