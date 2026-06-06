@@ -1,331 +1,780 @@
 ﻿'use client'
-import { useState, useEffect, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
-export default function Home() {
-  const [messages, setMessages] = useState<{role: string, content: string}[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [phase, setPhase] = useState(0)
-  const [conversationId, setConversationId] = useState<string | null>(null)
-  const [nomeChamado, setNomeChamado] = useState('')
-  const [userId, setUserId] = useState<string | null>(null)
-  const [assinante, setAssinante] = useState(false)
-  const [modo, setModo] = useState('mode_freud')
-  const [menuAberto, setMenuAberto] = useState(false)
-  const [ouvindo, setOuvindo] = useState(false)
-  const chatEndRef = useRef<HTMLDivElement>(null)
-  const recognitionRef = useRef<any>(null)
+export default function LandingPage() {
   const router = useRouter()
+  const [visible, setVisible] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
+  const heroRef = useRef<HTMLDivElement>(null)
+  const section2Ref = useRef<HTMLDivElement>(null)
+  const section3Ref = useRef<HTMLDivElement>(null)
+  const section4Ref = useRef<HTMLDivElement>(null)
+  const section5Ref = useRef<HTMLDivElement>(null)
 
-  const phases = ['Abertura', 'Infância', 'Dobras', 'Presente', 'Reencontro']
-
-  const modos = [
-    { id: 'mode_freud',     nome: 'Explorar',   descricao: 'O que está embaixo',              icone: '≡' },
-    { id: 'mode_jung',      nome: 'Integrar',   descricao: 'Quem você é de verdade',          icone: '∞' },
-    { id: 'mode_winnicott', nome: 'Origem',     descricao: 'Como você aprendeu a ser',        icone: '~' },
-    { id: 'mode_frankl',    nome: 'Sentido',    descricao: 'Para onde você está indo',        icone: '⊙' },
-    { id: 'mode_12camadas', nome: '12 Camadas', descricao: 'Sua personalidade fundo a fundo', icone: '◈', locked: true },
-  ]
-
-  const mapas = [
-    { id: 'map_apego',     nome: 'Como você se conecta',      descricao: 'Estilo de vínculo',          icone: '♡' },
-    { id: 'map_tracos',    nome: 'Como você é',               descricao: 'Seus traços mais profundos', icone: '◯' },
-    { id: 'map_cognitivo', nome: 'Como você pensa',           descricao: 'Seu modo de ver o mundo',    icone: '◎' },
-    { id: 'map_pressao',   nome: 'Como você age sob pressão', descricao: 'Seu padrão de reação',       icone: '△' },
-    { id: 'map_forcas',    nome: 'Suas forças naturais',      descricao: 'O que te move sem esforço',  icone: '✦' },
-    { id: 'map_valores',   nome: 'O que te move',             descricao: 'Seus valores vividos',       icone: '◇' },
-    { id: 'map_ambiente',  nome: 'Onde você floresce',        descricao: 'Seu ambiente ideal',         icone: '⌂' },
-    { id: 'map_vinculo',   nome: 'Como você recebe',          descricao: 'Como percebe afeto',         icone: '❋' },
-  ]
-
-  useEffect(() => { checkAuthAndLoad() }, [])
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
-
-  async function checkAuthAndLoad() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
-    setUserId(user.id)
-    const { data: profile } = await supabase.from('profiles').select('nome_chamado, assinante').eq('id', user.id).single()
-    if (profile?.nome_chamado) setNomeChamado(profile.nome_chamado)
-    if (profile?.assinante) setAssinante(profile.assinante)
-    const { data: conv } = await supabase.from('conversations').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single()
-    if (conv && conv.messages && conv.messages.length > 0) {
-      setMessages(conv.messages); setPhase(conv.phase || 0); setConversationId(conv.id)
-      if (conv.modo) setModo(conv.modo)
-    } else { startConversation(user.id) }
-  }
-
-  async function startConversation(uid: string) {
-    setLoading(true)
-    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: uid, modo, messages: [{ role: 'user', content: 'Inicie a conversa com acolhimento breve e gentil, termine perguntando como a pessoa está chegando hoje.' }] }) })
-    const data = await res.json()
-    if (data.paywall) { router.push('/assinar'); return }
-    const firstMsg = [{ role: 'assistant', content: data.content }]
-    setMessages(firstMsg)
-    const { data: conv } = await supabase.from('conversations').insert({ user_id: uid, messages: firstMsg, phase: 0, modo }).select().single()
-    if (conv) setConversationId(conv.id)
-    setLoading(false)
-  }
-
-  async function sendMessage() {
-    if (!input.trim() || loading) return
-    const userMsg = { role: 'user', content: input }
-    const newMessages = [...messages, userMsg]
-    setMessages(newMessages); setInput(''); setLoading(true)
-    const newPhase = newMessages.length % 6 === 0 && phase < 4 ? phase + 1 : phase
-    if (newPhase !== phase) setPhase(newPhase)
-    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: newMessages, userId, modo }) })
-    const data = await res.json()
-    if (data.paywall) { router.push('/assinar'); return }
-    const updatedMessages = [...newMessages, { role: 'assistant', content: data.content }]
-    setMessages(updatedMessages)
-    if (conversationId) { await supabase.from('conversations').update({ messages: updatedMessages, phase: newPhase, modo, updated_at: new Date().toISOString() }).eq('id', conversationId) }
-    setLoading(false)
-  }
-
-  function toggleMicrofone() {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SpeechRecognition) { alert('Seu navegador não suporta reconhecimento de voz.'); return }
-    if (ouvindo) { recognitionRef.current?.stop(); setOuvindo(false); return }
-    const recognition = new SpeechRecognition()
-    recognition.lang = 'pt-BR'
-    recognition.continuous = false
-    recognition.interimResults = false
-    recognition.onresult = (event: any) => {
-      const texto = event.results[0][0].transcript
-      setInput(prev => prev ? prev + ' ' + texto : texto)
-      setOuvindo(false)
+  // Opção B: logado vai direto pro chat
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        router.push('/chat')
+      } else {
+        setCheckingAuth(false)
+        setTimeout(() => setVisible(true), 100)
+      }
     }
-    recognition.onerror = () => setOuvindo(false)
-    recognition.onend = () => setOuvindo(false)
-    recognitionRef.current = recognition
-    recognition.start()
-    setOuvindo(true)
+    checkAuth()
+  }, [router])
+
+  // Intersection Observer para fade-in das seções
+  useEffect(() => {
+    if (checkingAuth) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('section-visible')
+          }
+        })
+      },
+      { threshold: 0.15 }
+    )
+    const sections = [section2Ref, section3Ref, section4Ref, section5Ref]
+    sections.forEach(ref => { if (ref.current) observer.observe(ref.current) })
+    return () => observer.disconnect()
+  }, [checkingAuth])
+
+  if (checkingAuth) {
+    return (
+      <div style={{
+        height: '100vh',
+        background: '#0d0f1a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <div style={{
+          width: '4px',
+          height: '4px',
+          borderRadius: '50%',
+          background: '#c4aa6a',
+          animation: 'pulse 1.5s ease-in-out infinite',
+        }} />
+      </div>
+    )
   }
-
-  function selecionarModo(m: typeof modos[0]) {
-    if (m.locked && !assinante) { router.push('/assinar'); return }
-    setModo(m.id); setMenuAberto(false)
-  }
-
-  async function sair() { await supabase.auth.signOut(); router.push('/login') }
-
-  const iniciais = nomeChamado ? nomeChamado.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : '?'
-  const modoAtivo = modos.find(m => m.id === modo)
 
   return (
-    <main style={{ height: '100vh', background: 'var(--background)', display: 'flex', fontFamily: 'Georgia, serif', overflow: 'hidden' }}>
-
-      {menuAberto && (
-        <div onClick={() => setMenuAberto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 10 }} />
-      )}
-
-      {/* ── SIDEBAR ── */}
-      <div
-        className={`sidebar ${menuAberto ? 'sidebar-open' : ''}`}
-        style={{
-          width: '220px', minWidth: '220px',
-          background: '#0d0d0d',
-          borderRight: '1px solid var(--border-surface)',
-          display: 'flex', flexDirection: 'column',
-          position: 'sticky', top: 0,
-          height: '100vh',
-          overflow: 'hidden',
-          zIndex: 20,
-        }}
-      >
-        {/* Topo */}
-        <div style={{ padding: '16px 14px', borderBottom: '1px solid var(--border-surface)', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-surface)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: 'var(--accent)', fontWeight: '600', flexShrink: 0 }}>
-            {iniciais}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="nome-usuario" style={{ fontSize: '16px', color: 'var(--foreground)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {nomeChamado || 'Você'}
-            </div>
-            <div className="status-plano" style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-              {assinante ? 'Assinante' : 'Plano gratuito'}
-            </div>
-          </div>
-          <span onClick={() => router.push('/perfil')} style={{ fontSize: '18px', color: 'var(--text-muted)', cursor: 'pointer', flexShrink: 0 }}>⚙</span>
-        </div>
-
-        {/* Meio — scrola */}
-        <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-          <div style={{ padding: '16px 14px 8px' }}>
-            <div className="label-secao" style={{ fontSize: '12px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Conversa</div>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>Escolha como quer se mover</div>
-            {modos.map(m => (
-              <button
-                key={m.id}
-                onClick={() => selecionarModo(m)}
-                style={{
-                  display: 'flex', alignItems: 'flex-start', gap: '9px',
-                  width: '100%', background: 'none', border: 'none',
-                  borderLeft: modo === m.id ? '2px solid var(--accent)' : '2px solid transparent',
-                  padding: '8px 0 8px 10px', cursor: 'pointer', textAlign: 'left', marginBottom: '1px',
-                }}
-              >
-                <span style={{ fontSize: '15px', color: modo === m.id ? 'var(--accent)' : '#666', flexShrink: 0, marginTop: '1px', fontFamily: 'monospace' }}>
-                  {m.icone}
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="nome-modo" style={{ fontSize: '14px', color: modo === m.id ? 'var(--foreground)' : '#888', fontWeight: modo === m.id ? '600' : '400', fontFamily: 'Georgia, serif' }}>
-                    {m.nome}
-                  </div>
-                  <div className="desc-modo" style={{ fontSize: '12px', color: '#555', marginTop: '1px' }}>{m.descricao}</div>
-                </div>
-                {m.locked && !assinante && <span style={{ fontSize: '13px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ height: '1px', background: 'var(--border-surface)', margin: '4px 0' }} />
-
-          <div style={{ padding: '12px 14px 8px' }}>
-            <div className="label-secao" style={{ fontSize: '12px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>Você se conhece?</div>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>Cada mapa revela uma camada diferente</div>
-            {mapas.map(m => (
-              <button
-                key={m.id}
-                onClick={() => { if (!assinante) router.push('/assinar') }}
-                style={{ display: 'flex', alignItems: 'flex-start', gap: '9px', width: '100%', background: 'none', border: 'none', padding: '7px 0 7px 10px', cursor: 'pointer', textAlign: 'left', marginBottom: '1px' }}
-              >
-                <span style={{ fontSize: '14px', color: '#666', flexShrink: 0, marginTop: '1px' }}>{m.icone}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13px', color: '#777', fontFamily: 'Georgia, serif' }}>{m.nome}</div>
-                  <div style={{ fontSize: '11px', color: '#555', marginTop: '1px' }}>{m.descricao}</div>
-                </div>
-                {!assinante && <span style={{ fontSize: '13px', color: 'var(--accent)', flexShrink: 0 }}>🔒</span>}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Rodapé */}
-        <div style={{ padding: '12px 14px', borderTop: '1px solid var(--border-surface)', flexShrink: 0 }}>
-          <button onClick={sair} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '13px', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
-            Sair
-          </button>
-        </div>
-      </div>
-
-      {/* ── ÁREA PRINCIPAL ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
-
-        {/* Header */}
-        <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border-surface)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-          <span onClick={() => setMenuAberto(!menuAberto)} className="menu-hamburguer" style={{ fontSize: '21px', color: '#888', cursor: 'pointer', display: 'none', marginRight: '4px' }}>☰</span>
-          <span style={{ fontSize: '18px', color: 'var(--foreground)', fontStyle: 'italic', flex: 1 }}>Conversa</span>
-          <span style={{ fontSize: '13px', color: 'var(--background)', background: 'var(--foreground)', padding: '3px 10px', borderRadius: '20px', fontFamily: 'Georgia, serif' }}>
-            {modoAtivo?.nome}
-          </span>
-          <span style={{ color: '#666', fontSize: '17px', cursor: 'pointer' }}>✎</span>
-          <span style={{ color: '#666', fontSize: '17px', cursor: 'pointer' }}>◷</span>
-        </div>
-
-        {/* Fase */}
-        <div style={{ textAlign: 'center', padding: '8px 0 4px', fontSize: '12px', color: '#666', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>
-          {phases[phase]}
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '4px', flexShrink: 0 }}>
-          {phases.map((_, i) => (
-            <div key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: i === phase ? 'var(--dot-active)' : i < phase ? 'var(--dot-done)' : 'var(--dot-inactive)' }} />
-          ))}
-        </div>
-
-        {/* Mensagens */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {messages.map((msg, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start', alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
-              <span style={{ fontSize: '11px', color: '#666', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>
-                {msg.role === 'user' ? (nomeChamado || 'Você').toUpperCase() : 'TRAVESSIA'}
-              </span>
-              <div style={{
-                padding: '12px 16px',
-                borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '2px 12px 12px 12px',
-                background: msg.role === 'user' ? 'var(--bg-secondary)' : 'var(--bg-surface)',
-                border: '1px solid var(--border-surface)',
-                color: msg.role === 'user' ? 'var(--text-secondary)' : 'var(--foreground)',
-                fontSize: '17px', lineHeight: '1.65',
-                fontStyle: msg.role === 'assistant' ? 'italic' : 'normal',
-              }}>
-                {msg.content}
-              </div>
-            </div>
-          ))}
-          {loading && (
-            <div style={{ display: 'flex', gap: '5px', padding: '10px 4px' }}>
-              {[0,1,2].map(i => <div key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--border)' }} />)}
-            </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
-
-        {/* Input */}
-        <div style={{ padding: '0 20px 18px', flexShrink: 0 }}>
-          <p style={{ textAlign: 'center', fontSize: '12px', color: '#555', marginBottom: '8px', letterSpacing: '0.04em' }}>
-            O Travessia revela, não aconselha · Em crise, ligue 188
-          </p>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', background: 'var(--bg-surface)', border: '1px solid var(--border-surface)', borderRadius: '12px', padding: '10px 12px' }}>
-            <textarea
-              value={input}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
-              onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-              placeholder={ouvindo ? 'Ouvindo...' : 'Escreva aqui com liberdade...'}
-              rows={2}
-              style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '16px', fontFamily: 'Georgia, serif', resize: 'none', outline: 'none', lineHeight: '1.5' }}
-            />
-            <button
-              onClick={toggleMicrofone}
-              style={{
-                width: '36px', height: '36px', borderRadius: '50%',
-                background: ouvindo ? 'var(--accent)' : 'transparent',
-                border: `1px solid ${ouvindo ? 'var(--accent)' : 'var(--border)'}`,
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '17px', flexShrink: 0,
-                transition: 'all 0.2s ease',
-              }}
-            >🎙️</button>
-            <button
-              onClick={sendMessage}
-              disabled={loading}
-              style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--cta-bg)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', color: 'var(--cta-text)', flexShrink: 0 }}
-            >↑</button>
-          </div>
-        </div>
-      </div>
-
+    <>
       <style>{`
-        .sidebar { transition: transform 0.3s ease; }
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          background: #0d0f1a;
+          color: #e8d9a0;
+          font-family: 'DM Sans', sans-serif;
+          overflow-x: hidden;
+        }
+
+        /* ── HERO ANIMATION ── */
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(1.5); }
+        }
+
+        @keyframes heroFadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes taglineFade {
+          0%   { opacity: 0; transform: translateY(16px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes subtitleFade {
+          0%   { opacity: 0; transform: translateY(12px); }
+          100% { opacity: 0.65; transform: translateY(0); }
+        }
+
+        @keyframes ctaFade {
+          0%   { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes ripple {
+          0%   { transform: scaleX(1) scaleY(1); opacity: 0.7; }
+          50%  { transform: scaleX(1.03) scaleY(0.97); opacity: 0.5; }
+          100% { transform: scaleX(1) scaleY(1); opacity: 0.7; }
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-6px); }
+        }
+
+        @keyframes glow {
+          0%, 100% { filter: blur(18px); opacity: 0.35; }
+          50%       { filter: blur(24px); opacity: 0.5; }
+        }
+
+        @keyframes particleRise {
+          0%   { transform: translateY(0) translateX(0); opacity: 0; }
+          20%  { opacity: 0.6; }
+          100% { transform: translateY(-80px) translateX(var(--drift)); opacity: 0; }
+        }
+
+        /* ── SECTION FADE IN ── */
+        .section-fade {
+          opacity: 0;
+          transform: translateY(24px);
+          transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .section-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* ── CTA BUTTON ── */
+        .cta-btn {
+          display: inline-block;
+          background: #e8d9a0;
+          color: #0d0f1a;
+          border: none;
+          padding: 16px 42px;
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 18px;
+          font-weight: 400;
+          letter-spacing: 0.06em;
+          cursor: pointer;
+          border-radius: 2px;
+          transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+          text-decoration: none;
+        }
+        .cta-btn:hover {
+          background: #f0e4b2;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 32px rgba(196, 170, 106, 0.25);
+        }
+
+        /* ── MODO CARD ── */
+        .modo-card {
+          border: 1px solid rgba(196, 170, 106, 0.15);
+          border-radius: 4px;
+          padding: 24px 22px;
+          transition: border-color 0.3s ease, background 0.3s ease;
+          cursor: default;
+        }
+        .modo-card:hover {
+          border-color: rgba(196, 170, 106, 0.4);
+          background: rgba(196, 170, 106, 0.04);
+        }
+
+        /* ── STEP ── */
+        .step-num {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 1px solid rgba(196, 170, 106, 0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 16px;
+          color: #c4aa6a;
+          flex-shrink: 0;
+        }
+
+        /* ── DOR FRASES ── */
+        .dor-frase {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: clamp(22px, 3.5vw, 32px);
+          font-style: italic;
+          color: #e8d9a0;
+          line-height: 1.5;
+          padding: 28px 0;
+          border-bottom: 1px solid rgba(232, 217, 160, 0.08);
+          opacity: 0;
+          transform: translateX(-12px);
+          transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .dor-frase.frase-visible {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(196, 170, 106, 0.2); border-radius: 2px; }
 
         @media (max-width: 768px) {
-          .sidebar {
-            position: fixed !important;
-            top: 0; left: 0;
-            width: 100vw !important;
-            min-width: 100vw !important;
-            height: 100vh;
-            transform: translateX(-100%);
-          }
-          .sidebar.sidebar-open { transform: translateX(0); }
-          .menu-hamburguer { display: block !important; }
-
-          .sidebar .nome-usuario { font-size: 18px !important; }
-          .sidebar .status-plano { font-size: 15px !important; }
-          .sidebar .label-secao  { font-size: 14px !important; }
-          .sidebar .nome-modo    { font-size: 18px !important; }
-          .sidebar .desc-modo    { font-size: 15px !important; color: #777 !important; }
+          .hero-tagline { font-size: clamp(34px, 8vw, 52px) !important; }
+          .hero-sub { font-size: 16px !important; }
+          .grid-modos { grid-template-columns: 1fr !important; }
+          .grid-steps { grid-template-columns: 1fr !important; }
+          .section-inner { padding: 0 24px !important; }
         }
-
-        @keyframes pulsar {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50%       { opacity: 0.6; transform: scale(1.1); }
-        }
-        .mic-ativo { animation: pulsar 1s ease-in-out infinite; }
       `}</style>
-    </main>
+
+      <main style={{ background: '#0d0f1a', minHeight: '100vh' }}>
+
+        {/* ══════════════════════════════════════════
+            SEÇÃO 1 — HERO
+        ══════════════════════════════════════════ */}
+        <section
+          ref={heroRef}
+          style={{
+            height: '100vh',
+            minHeight: '600px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Fundo — lago SVG animado */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, #080a12 0%, #0d0f1a 45%, #0a1a1a 100%)',
+          }} />
+
+          {/* Lua */}
+          <div style={{
+            position: 'absolute',
+            top: '12%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '90px',
+            height: '90px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle at 40% 38%, #f0e4b2, #e8d9a0 40%, #c4aa6a)',
+            animation: 'float 6s ease-in-out infinite',
+            zIndex: 2,
+          }}>
+            {/* Halo */}
+            <div style={{
+              position: 'absolute',
+              inset: '-20px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(232,217,160,0.18) 0%, transparent 70%)',
+              animation: 'glow 4s ease-in-out infinite',
+            }} />
+          </div>
+
+          {/* Reflexo dourado na água */}
+          <div style={{
+            position: 'absolute',
+            bottom: '15%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '3px',
+            height: '200px',
+            background: 'linear-gradient(to bottom, rgba(196,170,106,0.7), rgba(196,170,106,0.1), transparent)',
+            filter: 'blur(2px)',
+            animation: 'ripple 3s ease-in-out infinite',
+            zIndex: 1,
+          }} />
+          <div style={{
+            position: 'absolute',
+            bottom: '20%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '60px',
+            height: '80px',
+            background: 'radial-gradient(ellipse, rgba(196,170,106,0.12) 0%, transparent 70%)',
+            animation: 'ripple 3.5s ease-in-out infinite',
+            zIndex: 1,
+          }} />
+
+          {/* Silhueta */}
+          <div style={{
+            position: 'absolute',
+            bottom: '18%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 3,
+          }}>
+            <svg width="28" height="72" viewBox="0 0 28 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Cabeça */}
+              <ellipse cx="14" cy="7" rx="5.5" ry="6" fill="#050608"/>
+              {/* Corpo */}
+              <path d="M8 13 C6 20 5 32 6 44 L10 44 L10 36 L14 38 L18 36 L18 44 L22 44 C23 32 22 20 20 13 Z" fill="#050608"/>
+              {/* Pernas */}
+              <path d="M10 44 L8 65 L12 65 L14 52 L16 65 L20 65 L18 44 Z" fill="#050608"/>
+            </svg>
+          </div>
+
+          {/* Partículas */}
+          {[...Array(6)].map((_, i) => (
+            <div key={i} style={{
+              position: 'absolute',
+              bottom: `${22 + i * 4}%`,
+              left: `${46 + (i % 3) * 3}%`,
+              width: '2px',
+              height: '2px',
+              borderRadius: '50%',
+              background: '#c4aa6a',
+              opacity: 0,
+              '--drift': `${(i % 2 === 0 ? 1 : -1) * (8 + i * 4)}px`,
+              animation: `particleRise ${2.5 + i * 0.4}s ease-out ${i * 0.6}s infinite`,
+            } as React.CSSProperties} />
+          ))}
+
+          {/* Linha do horizonte */}
+          <div style={{
+            position: 'absolute',
+            bottom: '24%',
+            left: 0,
+            right: 0,
+            height: '1px',
+            background: 'linear-gradient(to right, transparent, rgba(196,170,106,0.12), transparent)',
+          }} />
+
+          {/* Texto hero */}
+          <div style={{
+            position: 'relative',
+            zIndex: 10,
+            textAlign: 'center',
+            padding: '0 24px',
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 0.6s ease',
+          }}>
+            <h1
+              className="hero-tagline"
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontSize: 'clamp(38px, 6vw, 68px)',
+                fontWeight: 300,
+                fontStyle: 'italic',
+                color: '#e8d9a0',
+                lineHeight: 1.2,
+                letterSpacing: '-0.01em',
+                marginBottom: '24px',
+                animation: visible ? 'taglineFade 1s ease forwards' : 'none',
+                animationDelay: '0.2s',
+                opacity: 0,
+              }}
+            >
+              Quando você perdeu<br />a si mesmo?
+            </h1>
+
+            <p
+              className="hero-sub"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '18px',
+                fontWeight: 300,
+                color: '#e8d9a0',
+                lineHeight: 1.7,
+                maxWidth: '440px',
+                margin: '0 auto 40px',
+                animation: visible ? 'subtitleFade 1s ease forwards' : 'none',
+                animationDelay: '0.6s',
+                opacity: 0,
+              }}
+            >
+              Não é falta de disciplina.<br />É falta de direção interna.
+            </p>
+
+            <div style={{
+              animation: visible ? 'ctaFade 1s ease forwards' : 'none',
+              animationDelay: '1s',
+              opacity: 0,
+            }}>
+              <button
+                className="cta-btn"
+                onClick={() => router.push('/login')}
+              >
+                Começar gratuitamente
+              </button>
+              <p style={{
+                marginTop: '16px',
+                fontSize: '13px',
+                color: 'rgba(232, 217, 160, 0.4)',
+                fontFamily: "'DM Sans', sans-serif",
+                letterSpacing: '0.04em',
+              }}>
+                Sem cartão. Sem compromisso.
+              </p>
+            </div>
+          </div>
+
+          {/* Scroll hint */}
+          <div style={{
+            position: 'absolute',
+            bottom: '32px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '6px',
+            opacity: 0.3,
+            animation: visible ? 'ctaFade 1s ease forwards' : 'none',
+            animationDelay: '1.8s',
+          }}>
+            <div style={{
+              width: '1px',
+              height: '40px',
+              background: 'linear-gradient(to bottom, transparent, #c4aa6a)',
+              animation: 'float 2s ease-in-out infinite',
+            }} />
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            SEÇÃO 2 — DOR (o espelho)
+        ══════════════════════════════════════════ */}
+        <section
+          ref={section2Ref}
+          className="section-fade"
+          style={{
+            padding: 'clamp(80px, 12vh, 140px) 0',
+            maxWidth: '720px',
+            margin: '0 auto',
+          }}
+        >
+          <div className="section-inner" style={{ padding: '0 40px' }}>
+            <DorFrase delay={0}>
+              Você termina o dia sem saber onde as horas foram.
+            </DorFrase>
+            <DorFrase delay={150}>
+              Você sabe o que precisa fazer. E não começa.
+            </DorFrase>
+            <DorFrase delay={300}>
+              Você se distancia de si mesmo sem perceber por quê.
+            </DorFrase>
+          </div>
+        </section>
+
+        {/* Divisor */}
+        <div style={{
+          width: '1px',
+          height: '80px',
+          background: 'linear-gradient(to bottom, transparent, rgba(196,170,106,0.2), transparent)',
+          margin: '0 auto',
+        }} />
+
+        {/* ══════════════════════════════════════════
+            SEÇÃO 3 — O QUE É
+        ══════════════════════════════════════════ */}
+        <section
+          ref={section3Ref}
+          className="section-fade"
+          style={{
+            padding: 'clamp(80px, 12vh, 140px) 0',
+            maxWidth: '800px',
+            margin: '0 auto',
+            textAlign: 'center',
+          }}
+        >
+          <div className="section-inner" style={{ padding: '0 40px' }}>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#c4aa6a',
+              marginBottom: '32px',
+            }}>
+              O que é a Travessia
+            </p>
+
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 'clamp(28px, 4vw, 44px)',
+              fontWeight: 300,
+              fontStyle: 'italic',
+              color: '#e8d9a0',
+              lineHeight: 1.4,
+              marginBottom: '24px',
+            }}>
+              Uma conversa que revela.<br />Não uma ferramenta que resolve.
+            </h2>
+
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '17px',
+              fontWeight: 300,
+              color: 'rgba(232, 217, 160, 0.6)',
+              lineHeight: 1.8,
+              maxWidth: '560px',
+              margin: '0 auto 60px',
+            }}>
+              Travessia é autoconhecimento guiado por inteligência artificial.
+              Não é terapia. Não é coaching. Não é app de produtividade.
+              É outra coisa.
+            </p>
+
+            {/* Cards dos modos */}
+            <div className="grid-modos" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '16px',
+              textAlign: 'left',
+            }}>
+              {[
+                { icone: '≡', nome: 'Explorar', desc: 'O que está embaixo do que você sente' },
+                { icone: '∞', nome: 'Integrar', desc: 'Quem você é de verdade' },
+                { icone: '~', nome: 'Origem',   desc: 'Como você aprendeu a ser assim' },
+                { icone: '⊙', nome: 'Sentido',  desc: 'Para onde você está indo' },
+              ].map((m, i) => (
+                <div key={i} className="modo-card">
+                  <div style={{
+                    fontFamily: 'monospace',
+                    fontSize: '20px',
+                    color: '#c4aa6a',
+                    marginBottom: '12px',
+                  }}>{m.icone}</div>
+                  <div style={{
+                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    fontSize: '20px',
+                    fontWeight: 400,
+                    color: '#e8d9a0',
+                    marginBottom: '6px',
+                  }}>{m.nome}</div>
+                  <div style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '14px',
+                    fontWeight: 300,
+                    color: 'rgba(232, 217, 160, 0.45)',
+                    lineHeight: 1.5,
+                  }}>{m.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Divisor */}
+        <div style={{
+          width: '1px',
+          height: '80px',
+          background: 'linear-gradient(to bottom, transparent, rgba(196,170,106,0.2), transparent)',
+          margin: '0 auto',
+        }} />
+
+        {/* ══════════════════════════════════════════
+            SEÇÃO 4 — COMO FUNCIONA
+        ══════════════════════════════════════════ */}
+        <section
+          ref={section4Ref}
+          className="section-fade"
+          style={{
+            padding: 'clamp(80px, 12vh, 140px) 0',
+            maxWidth: '700px',
+            margin: '0 auto',
+          }}
+        >
+          <div className="section-inner" style={{ padding: '0 40px' }}>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#c4aa6a',
+              marginBottom: '48px',
+              textAlign: 'center',
+            }}>
+              Como funciona
+            </p>
+
+            <div className="grid-steps" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '32px',
+            }}>
+              {[
+                { n: '01', titulo: 'Você cria uma conta',        desc: 'Em 30 segundos. Só email e nome.' },
+                { n: '02', titulo: 'Escolhe por onde começar',    desc: 'Explorar, integrar, buscar origem ou sentido.' },
+                { n: '03', titulo: 'A conversa começa',           desc: 'Perguntas que ninguém te fez antes.' },
+                { n: '04', titulo: 'Algo se move',                desc: 'Você não sai com uma resposta. Sai diferente.' },
+              ].map(s => (
+                <div key={s.n} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                  <div className="step-num">{s.n}</div>
+                  <div>
+                    <div style={{
+                      fontFamily: "'Cormorant Garamond', Georgia, serif",
+                      fontSize: '18px',
+                      color: '#e8d9a0',
+                      marginBottom: '6px',
+                      fontWeight: 400,
+                    }}>{s.titulo}</div>
+                    <div style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '14px',
+                      fontWeight: 300,
+                      color: 'rgba(232, 217, 160, 0.45)',
+                      lineHeight: 1.6,
+                    }}>{s.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            SEÇÃO 5 — CTA FINAL
+        ══════════════════════════════════════════ */}
+        <section
+          ref={section5Ref}
+          className="section-fade"
+          style={{
+            padding: 'clamp(100px, 16vh, 180px) 0',
+            textAlign: 'center',
+            position: 'relative',
+          }}
+        >
+          {/* Glow de fundo */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '600px',
+            height: '300px',
+            background: 'radial-gradient(ellipse, rgba(196,170,106,0.06) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }} />
+
+          <div style={{ position: 'relative', zIndex: 1, padding: '0 24px' }}>
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 'clamp(32px, 5vw, 56px)',
+              fontWeight: 300,
+              fontStyle: 'italic',
+              color: '#e8d9a0',
+              lineHeight: 1.3,
+              marginBottom: '20px',
+            }}>
+              A primeira travessia<br />é gratuita.
+            </h2>
+
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '16px',
+              fontWeight: 300,
+              color: 'rgba(232, 217, 160, 0.45)',
+              marginBottom: '48px',
+            }}>
+              Sem cartão. Sem compromisso. Sem pressa.
+            </p>
+
+            <button
+              className="cta-btn"
+              onClick={() => router.push('/login')}
+            >
+              Começar agora
+            </button>
+
+            <p style={{
+              marginTop: '20px',
+              fontSize: '12px',
+              color: 'rgba(232, 217, 160, 0.25)',
+              fontFamily: "'DM Sans', sans-serif",
+              letterSpacing: '0.04em',
+            }}>
+              Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
+            </p>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            FOOTER
+        ══════════════════════════════════════════ */}
+        <footer style={{
+          borderTop: '1px solid rgba(196, 170, 106, 0.08)',
+          padding: '32px 40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px',
+        }}>
+          <span style={{
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontSize: '18px',
+            fontStyle: 'italic',
+            color: 'rgba(232, 217, 160, 0.3)',
+          }}>
+            Travessia
+          </span>
+          <div style={{ display: 'flex', gap: '32px' }}>
+            <a
+              href="/privacidade"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '13px',
+                color: 'rgba(232, 217, 160, 0.3)',
+                textDecoration: 'none',
+                letterSpacing: '0.04em',
+                transition: 'color 0.2s ease',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.7)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.3)')}
+            >
+              Privacidade
+            </a>
+            <a
+              href="/login"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '13px',
+                color: 'rgba(232, 217, 160, 0.3)',
+                textDecoration: 'none',
+                letterSpacing: '0.04em',
+                transition: 'color 0.2s ease',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.7)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.3)')}
+            >
+              Entrar
+            </a>
+          </div>
+          <span style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '12px',
+            color: 'rgba(232, 217, 160, 0.2)',
+            letterSpacing: '0.04em',
+          }}>
+            © 2026 Travessia
+          </span>
+        </footer>
+      </main>
+    </>
+  )
+}
+
+/* ── COMPONENTE AUXILIAR: frase com fade-in por scroll ── */
+function DorFrase({ children, delay }: { children: React.ReactNode; delay: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && ref.current) {
+          setTimeout(() => {
+            ref.current?.classList.add('frase-visible')
+          }, delay)
+        }
+      },
+      { threshold: 0.4 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [delay])
+
+  return (
+    <div ref={ref} className="dor-frase">
+      {children}
+    </div>
   )
 }
