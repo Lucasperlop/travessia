@@ -13,7 +13,6 @@ export default function LandingPage() {
   const section4Ref = useRef<HTMLDivElement>(null)
   const section5Ref = useRef<HTMLDivElement>(null)
 
-  // Opção B: logado vai direto pro chat
   useEffect(() => {
     async function checkAuth() {
       const { data: { user } } = await supabase.auth.getUser()
@@ -27,7 +26,6 @@ export default function LandingPage() {
     checkAuth()
   }, [router])
 
-  // Intersection Observer para fade-in das seções
   useEffect(() => {
     if (checkingAuth) return
     const observer = new IntersectionObserver(
@@ -79,15 +77,9 @@ export default function LandingPage() {
           overflow-x: hidden;
         }
 
-        /* ── HERO ANIMATION ── */
         @keyframes pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.4; transform: scale(1.5); }
-        }
-
-        @keyframes heroFadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes taglineFade {
@@ -127,7 +119,6 @@ export default function LandingPage() {
           100% { transform: translateY(-80px) translateX(var(--drift)); opacity: 0; }
         }
 
-        /* ── SECTION FADE IN ── */
         .section-fade {
           opacity: 0;
           transform: translateY(24px);
@@ -138,7 +129,6 @@ export default function LandingPage() {
           transform: translateY(0);
         }
 
-        /* ── CTA BUTTON ── */
         .cta-btn {
           display: inline-block;
           background: #e8d9a0;
@@ -160,7 +150,6 @@ export default function LandingPage() {
           box-shadow: 0 8px 32px rgba(196, 170, 106, 0.25);
         }
 
-        /* ── MODO CARD ── */
         .modo-card {
           border: 1px solid rgba(196, 170, 106, 0.15);
           border-radius: 4px;
@@ -173,7 +162,6 @@ export default function LandingPage() {
           background: rgba(196, 170, 106, 0.04);
         }
 
-        /* ── STEP ── */
         .step-num {
           width: 36px;
           height: 36px;
@@ -188,7 +176,6 @@ export default function LandingPage() {
           flex-shrink: 0;
         }
 
-        /* ── DOR FRASES ── */
         .dor-frase {
           font-family: 'Cormorant Garamond', Georgia, serif;
           font-size: clamp(22px, 3.5vw, 32px);
@@ -206,7 +193,6 @@ export default function LandingPage() {
           transform: translateX(0);
         }
 
-        /* ── SCROLLBAR ── */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(196, 170, 106, 0.2); border-radius: 2px; }
@@ -222,9 +208,7 @@ export default function LandingPage() {
 
       <main style={{ background: '#0d0f1a', minHeight: '100vh' }}>
 
-        {/* ══════════════════════════════════════════
-            SEÇÃO 1 — HERO
-        ══════════════════════════════════════════ */}
+        {/* ══ SEÇÃO 1 — HERO ══ */}
         <section
           ref={heroRef}
           style={{
@@ -238,7 +222,6 @@ export default function LandingPage() {
             overflow: 'hidden',
           }}
         >
-          {/* Fundo — lago SVG animado */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -258,7 +241,6 @@ export default function LandingPage() {
             animation: 'float 6s ease-in-out infinite',
             zIndex: 2,
           }}>
-            {/* Halo */}
             <div style={{
               position: 'absolute',
               inset: '-20px',
@@ -268,7 +250,7 @@ export default function LandingPage() {
             }} />
           </div>
 
-          {/* Reflexo dourado na água */}
+          {/* Reflexo */}
           <div style={{
             position: 'absolute',
             bottom: '15%',
@@ -302,11 +284,8 @@ export default function LandingPage() {
             zIndex: 3,
           }}>
             <svg width="28" height="72" viewBox="0 0 28 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Cabeça */}
               <ellipse cx="14" cy="7" rx="5.5" ry="6" fill="#050608"/>
-              {/* Corpo */}
               <path d="M8 13 C6 20 5 32 6 44 L10 44 L10 36 L14 38 L18 36 L18 44 L22 44 C23 32 22 20 20 13 Z" fill="#050608"/>
-              {/* Pernas */}
               <path d="M10 44 L8 65 L12 65 L14 52 L16 65 L20 65 L18 44 Z" fill="#050608"/>
             </svg>
           </div>
@@ -327,7 +306,7 @@ export default function LandingPage() {
             } as React.CSSProperties} />
           ))}
 
-          {/* Linha do horizonte */}
+          {/* Horizonte */}
           <div style={{
             position: 'absolute',
             bottom: '24%',
@@ -337,7 +316,7 @@ export default function LandingPage() {
             background: 'linear-gradient(to right, transparent, rgba(196,170,106,0.12), transparent)',
           }} />
 
-          {/* Texto hero */}
+          {/* Texto */}
           <div style={{
             position: 'relative',
             zIndex: 10,
@@ -380,7 +359,7 @@ export default function LandingPage() {
                 opacity: 0,
               }}
             >
-              Não é falta de disciplina.<br />É falta de direção interna.
+              Não te falta foco.<br />Te falta contato com quem você é.
             </p>
 
             <div style={{
@@ -388,11 +367,8 @@ export default function LandingPage() {
               animationDelay: '1s',
               opacity: 0,
             }}>
-              <button
-                className="cta-btn"
-                onClick={() => router.push('/login')}
-              >
-                Começar gratuitamente
+              <button className="cta-btn" onClick={() => router.push('/login')}>
+                Começar minha travessia
               </button>
               <p style={{
                 marginTop: '16px',
@@ -401,7 +377,7 @@ export default function LandingPage() {
                 fontFamily: "'DM Sans', sans-serif",
                 letterSpacing: '0.04em',
               }}>
-                Sem cartão. Sem compromisso.
+                Nenhum compromisso. Só você.
               </p>
             </div>
           </div>
@@ -412,10 +388,6 @@ export default function LandingPage() {
             bottom: '32px',
             left: '50%',
             transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '6px',
             opacity: 0.3,
             animation: visible ? 'ctaFade 1s ease forwards' : 'none',
             animationDelay: '1.8s',
@@ -429,9 +401,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            SEÇÃO 2 — DOR (o espelho)
-        ══════════════════════════════════════════ */}
+        {/* ══ SEÇÃO 2 — DOR ══ */}
         <section
           ref={section2Ref}
           className="section-fade"
@@ -443,28 +413,31 @@ export default function LandingPage() {
         >
           <div className="section-inner" style={{ padding: '0 40px' }}>
             <DorFrase delay={0}>
-              Você termina o dia sem saber onde as horas foram.
+              Você estava lá. Mas não estava.
             </DorFrase>
             <DorFrase delay={150}>
-              Você sabe o que precisa fazer. E não começa.
+              Você não sabe o que está evitando. Sabe só que está evitando.
             </DorFrase>
             <DorFrase delay={300}>
-              Você se distancia de si mesmo sem perceber por quê.
+              Você consegue tudo que precisava. E ainda assim.
+            </DorFrase>
+            <DorFrase delay={450}>
+              Você passou tanto tempo sendo quem precisavam que esqueceu quem é.
+            </DorFrase>
+            <DorFrase delay={600}>
+              E se o problema não for você — mas o que você ainda não sabe sobre você?
             </DorFrase>
           </div>
         </section>
 
         {/* Divisor */}
         <div style={{
-          width: '1px',
-          height: '80px',
+          width: '1px', height: '80px',
           background: 'linear-gradient(to bottom, transparent, rgba(196,170,106,0.2), transparent)',
           margin: '0 auto',
         }} />
 
-        {/* ══════════════════════════════════════════
-            SEÇÃO 3 — O QUE É
-        ══════════════════════════════════════════ */}
+        {/* ══ SEÇÃO 3 — O QUE É ══ */}
         <section
           ref={section3Ref}
           className="section-fade"
@@ -494,23 +467,25 @@ export default function LandingPage() {
               fontStyle: 'italic',
               color: '#e8d9a0',
               lineHeight: 1.4,
-              marginBottom: '24px',
+              marginBottom: '32px',
             }}>
-              Uma conversa que revela.<br />Não uma ferramenta que resolve.
+              Você não precisa de mais respostas.<br />Precisa das perguntas certas.
             </h2>
 
             <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '17px',
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 'clamp(18px, 2vw, 22px)',
               fontWeight: 300,
-              color: 'rgba(232, 217, 160, 0.6)',
+              fontStyle: 'italic',
+              color: 'rgba(232, 217, 160, 0.7)',
               lineHeight: 1.8,
               maxWidth: '560px',
               margin: '0 auto 60px',
             }}>
-              Travessia é autoconhecimento guiado por inteligência artificial.
-              Não é terapia. Não é coaching. Não é app de produtividade.
-              É outra coisa.
+              Existe um pensamento que você pensa há anos<br />
+              mas ainda não colocou em palavras.<br />
+              <br />
+              A Travessia começa onde você parou de perguntar.
             </p>
 
             {/* Cards dos modos */}
@@ -521,10 +496,10 @@ export default function LandingPage() {
               textAlign: 'left',
             }}>
               {[
-                { icone: '≡', nome: 'Explorar', desc: 'O que está embaixo do que você sente' },
-                { icone: '∞', nome: 'Integrar', desc: 'Quem você é de verdade' },
-                { icone: '~', nome: 'Origem',   desc: 'Como você aprendeu a ser assim' },
-                { icone: '⊙', nome: 'Sentido',  desc: 'Para onde você está indo' },
+                { icone: '≡', nome: 'Explorar', desc: 'Por que você reage assim — mesmo quando não quer?' },
+                { icone: '∞', nome: 'Integrar', desc: 'A versão de você que você ainda não apresentou a ninguém.' },
+                { icone: '~', nome: 'Origem',   desc: 'Quando você começou a ser quem os outros precisavam?' },
+                { icone: '⊙', nome: 'Sentido',  desc: 'O que você está construindo — e se vale o que está custando.' },
               ].map((m, i) => (
                 <div key={i} className="modo-card">
                   <div style={{
@@ -538,14 +513,15 @@ export default function LandingPage() {
                     fontSize: '20px',
                     fontWeight: 400,
                     color: '#e8d9a0',
-                    marginBottom: '6px',
+                    marginBottom: '10px',
                   }}>{m.nome}</div>
                   <div style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '14px',
+                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    fontSize: '15px',
+                    fontStyle: 'italic',
                     fontWeight: 300,
-                    color: 'rgba(232, 217, 160, 0.45)',
-                    lineHeight: 1.5,
+                    color: 'rgba(232, 217, 160, 0.55)',
+                    lineHeight: 1.6,
                   }}>{m.desc}</div>
                 </div>
               ))}
@@ -555,15 +531,12 @@ export default function LandingPage() {
 
         {/* Divisor */}
         <div style={{
-          width: '1px',
-          height: '80px',
+          width: '1px', height: '80px',
           background: 'linear-gradient(to bottom, transparent, rgba(196,170,106,0.2), transparent)',
           margin: '0 auto',
         }} />
 
-        {/* ══════════════════════════════════════════
-            SEÇÃO 4 — COMO FUNCIONA
-        ══════════════════════════════════════════ */}
+        {/* ══ SEÇÃO 4 — COMO FUNCIONA ══ */}
         <section
           ref={section4Ref}
           className="section-fade"
@@ -592,10 +565,26 @@ export default function LandingPage() {
               gap: '32px',
             }}>
               {[
-                { n: '01', titulo: 'Você cria uma conta',        desc: 'Em 30 segundos. Só email e nome.' },
-                { n: '02', titulo: 'Escolhe por onde começar',    desc: 'Explorar, integrar, buscar origem ou sentido.' },
-                { n: '03', titulo: 'A conversa começa',           desc: 'Perguntas que ninguém te fez antes.' },
-                { n: '04', titulo: 'Algo se move',                desc: 'Você não sai com uma resposta. Sai diferente.' },
+                {
+                  n: '01',
+                  titulo: 'Você cria uma conta',
+                  desc: 'Em 30 segundos. Só email e nome.',
+                },
+                {
+                  n: '02',
+                  titulo: 'Escolhe por onde começar',
+                  desc: 'Cada modo é uma entrada diferente para a mesma travessia.',
+                },
+                {
+                  n: '03',
+                  titulo: 'A conversa começa',
+                  desc: 'Não tem resposta certa. Só tem honestidade.',
+                },
+                {
+                  n: '04',
+                  titulo: 'Algo se move',
+                  desc: 'Você não vai sair com uma solução. Vai sair sabendo algo que não sabia antes de entrar.',
+                },
               ].map(s => (
                 <div key={s.n} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                   <div className="step-num">{s.n}</div>
@@ -604,7 +593,7 @@ export default function LandingPage() {
                       fontFamily: "'Cormorant Garamond', Georgia, serif",
                       fontSize: '18px',
                       color: '#e8d9a0',
-                      marginBottom: '6px',
+                      marginBottom: '8px',
                       fontWeight: 400,
                     }}>{s.titulo}</div>
                     <div style={{
@@ -612,7 +601,7 @@ export default function LandingPage() {
                       fontSize: '14px',
                       fontWeight: 300,
                       color: 'rgba(232, 217, 160, 0.45)',
-                      lineHeight: 1.6,
+                      lineHeight: 1.7,
                     }}>{s.desc}</div>
                   </div>
                 </div>
@@ -621,9 +610,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            SEÇÃO 5 — CTA FINAL
-        ══════════════════════════════════════════ */}
+        {/* ══ SEÇÃO 5 — CTA FINAL ══ */}
         <section
           ref={section5Ref}
           className="section-fade"
@@ -633,14 +620,11 @@ export default function LandingPage() {
             position: 'relative',
           }}
         >
-          {/* Glow de fundo */}
           <div style={{
             position: 'absolute',
-            top: '50%',
-            left: '50%',
+            top: '50%', left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '600px',
-            height: '300px',
+            width: '600px', height: '300px',
             background: 'radial-gradient(ellipse, rgba(196,170,106,0.06) 0%, transparent 70%)',
             pointerEvents: 'none',
           }} />
@@ -664,15 +648,13 @@ export default function LandingPage() {
               fontWeight: 300,
               color: 'rgba(232, 217, 160, 0.45)',
               marginBottom: '48px',
+              lineHeight: 1.7,
             }}>
-              Sem cartão. Sem compromisso. Sem pressa.
+              Você entra quando quiser. Sai quando quiser.<br />Fica se fizer sentido.
             </p>
 
-            <button
-              className="cta-btn"
-              onClick={() => router.push('/login')}
-            >
-              Começar agora
+            <button className="cta-btn" onClick={() => router.push('/login')}>
+              Entrar na travessia
             </button>
 
             <p style={{
@@ -687,9 +669,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            FOOTER
-        ══════════════════════════════════════════ */}
+        {/* ══ FOOTER ══ */}
         <footer style={{
           borderTop: '1px solid rgba(196, 170, 106, 0.08)',
           padding: '32px 40px',
@@ -708,34 +688,28 @@ export default function LandingPage() {
             Travessia
           </span>
           <div style={{ display: 'flex', gap: '32px' }}>
-            <a
-              href="/privacidade"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '13px',
-                color: 'rgba(232, 217, 160, 0.3)',
-                textDecoration: 'none',
-                letterSpacing: '0.04em',
-                transition: 'color 0.2s ease',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.7)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.3)')}
-            >
+            <a href="/privacidade" style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              color: 'rgba(232, 217, 160, 0.3)',
+              textDecoration: 'none',
+              letterSpacing: '0.04em',
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.7)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.3)')}>
               Privacidade
             </a>
-            <a
-              href="/login"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '13px',
-                color: 'rgba(232, 217, 160, 0.3)',
-                textDecoration: 'none',
-                letterSpacing: '0.04em',
-                transition: 'color 0.2s ease',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.7)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.3)')}
-            >
+            <a href="/login" style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              color: 'rgba(232, 217, 160, 0.3)',
+              textDecoration: 'none',
+              letterSpacing: '0.04em',
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.7)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.3)')}>
               Entrar
             </a>
           </div>
@@ -753,7 +727,6 @@ export default function LandingPage() {
   )
 }
 
-/* ── COMPONENTE AUXILIAR: frase com fade-in por scroll ── */
 function DorFrase({ children, delay }: { children: React.ReactNode; delay: number }) {
   const ref = useRef<HTMLDivElement>(null)
 
