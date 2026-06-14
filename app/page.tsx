@@ -1,17 +1,19 @@
 ﻿'use client'
+
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function LandingPage() {
   const router = useRouter()
-  const [visible, setVisible] = useState(false)
+  const supabase = createClientComponentClient()
   const [checkingAuth, setCheckingAuth] = useState(true)
-  const heroRef = useRef<HTMLDivElement>(null)
-  const section2Ref = useRef<HTMLDivElement>(null)
-  const section3Ref = useRef<HTMLDivElement>(null)
-  const section4Ref = useRef<HTMLDivElement>(null)
-  const section5Ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  const section2Ref = useRef<HTMLElement>(null)
+  const section3Ref = useRef<HTMLElement>(null)
+  const section4Ref = useRef<HTMLElement>(null)
+  const section5Ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
     async function checkAuth() {
@@ -36,95 +38,90 @@ export default function LandingPage() {
           }
         })
       },
-      { threshold: 0.15 }
+      { threshold: 0.12 }
     )
     const sections = [section2Ref, section3Ref, section4Ref, section5Ref]
-    sections.forEach(ref => { if (ref.current) observer.observe(ref.current) })
+    sections.forEach(ref => {
+      if (ref.current) observer.observe(ref.current)
+    })
     return () => observer.disconnect()
   }, [checkingAuth])
 
   if (checkingAuth) {
     return (
       <div style={{
-        height: '100vh',
+        minHeight: '100vh',
         background: '#0d0f1a',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <div style={{
-          width: '4px',
-          height: '4px',
-          borderRadius: '50%',
-          background: '#c4aa6a',
-          animation: 'pulse 1.5s ease-in-out infinite',
-        }} />
-      </div>
+        justifyContent: 'center'
+      }} />
     )
   }
+
+  const modos = [
+    {
+      icone: '≡',
+      nome: 'O que estou carregando',
+      descricao: 'Fale sobre aquilo que está pesando hoje.'
+    },
+    {
+      icone: '∞',
+      nome: 'Quem eu me tornei',
+      descricao: 'Reflita sobre a distância entre quem você é e quem gostaria de ser.'
+    },
+    {
+      icone: '~',
+      nome: 'De onde isso vem',
+      descricao: 'Explore padrões, escolhas e experiências que continuam se repetindo.'
+    },
+    {
+      icone: '⊙',
+      nome: 'O que realmente importa',
+      descricao: 'Questões de propósito, direção e significado.'
+    },
+  ]
+
+  const dorFrases = [
+    'Você continua seguindo em frente.',
+    'Mas existe algo que você evita pensar quando o dia termina.',
+    'Uma conversa que nunca aconteceu.',
+    'Uma pergunta que continua voltando.',
+    'Uma parte de você que aprendeu a ficar em silêncio.',
+  ]
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap');
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
           background: #0d0f1a;
           color: #e8d9a0;
           font-family: 'DM Sans', sans-serif;
-          overflow-x: hidden;
-        }
-
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(1.5); }
-        }
-
-        @keyframes taglineFade {
-          0%   { opacity: 0; transform: translateY(16px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes subtitleFade {
-          0%   { opacity: 0; transform: translateY(12px); }
-          100% { opacity: 0.65; transform: translateY(0); }
-        }
-
-        @keyframes ctaFade {
-          0%   { opacity: 0; transform: translateY(10px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes ripple {
-          0%   { transform: scaleX(1) scaleY(1); opacity: 0.7; }
-          50%  { transform: scaleX(1.03) scaleY(0.97); opacity: 0.5; }
-          100% { transform: scaleX(1) scaleY(1); opacity: 0.7; }
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50%       { transform: translateY(-6px); }
-        }
-
-        @keyframes glow {
-          0%, 100% { filter: blur(18px); opacity: 0.35; }
-          50%       { filter: blur(24px); opacity: 0.5; }
-        }
-
-        @keyframes particleRise {
-          0%   { transform: translateY(0) translateX(0); opacity: 0; }
-          20%  { opacity: 0.6; }
-          100% { transform: translateY(-80px) translateX(var(--drift)); opacity: 0; }
+          -webkit-font-smoothing: antialiased;
         }
 
         .section-fade {
           opacity: 0;
-          transform: translateY(24px);
+          transform: translateY(28px);
+          transition: opacity 0.9s ease, transform 0.9s ease;
+        }
+
+        .section-visible {
+          opacity: 1 !important;
+          transform: translateY(0) !important;
+        }
+
+        .dor-frase {
+          opacity: 0;
+          transform: translateY(18px);
           transition: opacity 0.8s ease, transform 0.8s ease;
         }
-        .section-visible {
+
+        .dor-frase.frase-visible {
           opacity: 1;
           transform: translateY(0);
         }
@@ -133,621 +130,485 @@ export default function LandingPage() {
           display: inline-block;
           background: #e8d9a0;
           color: #0d0f1a;
-          border: none;
-          padding: 16px 42px;
-          font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: 18px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 15px;
           font-weight: 400;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.04em;
+          padding: 14px 36px;
+          border-radius: 8px;
+          border: none;
           cursor: pointer;
-          border-radius: 2px;
-          transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
           text-decoration: none;
+          transition: opacity 0.2s ease;
         }
-        .cta-btn:hover {
-          background: #f0e4b2;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(196, 170, 106, 0.25);
-        }
+
+        .cta-btn:hover { opacity: 0.88; }
 
         .modo-card {
-          border: 1px solid rgba(196, 170, 106, 0.15);
-          border-radius: 4px;
-          padding: 24px 22px;
-          transition: border-color 0.3s ease, background 0.3s ease;
-          cursor: default;
-        }
-        .modo-card:hover {
-          border-color: rgba(196, 170, 106, 0.4);
-          background: rgba(196, 170, 106, 0.04);
+          background: #080a12;
+          border: 1px solid #1a1f35;
+          border-radius: 10px;
+          padding: 28px 24px;
+          transition: border-color 0.2s ease;
         }
 
-        .step-num {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          border: 1px solid rgba(196, 170, 106, 0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 16px;
-          color: #c4aa6a;
-          flex-shrink: 0;
-        }
+        .modo-card:hover { border-color: #c4aa6a; }
 
-        .dor-frase {
-          font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: clamp(22px, 3.5vw, 32px);
-          font-style: italic;
-          color: #e8d9a0;
-          line-height: 1.5;
-          padding: 28px 0;
-          border-bottom: 1px solid rgba(232, 217, 160, 0.08);
-          opacity: 0;
-          transform: translateX(-12px);
-          transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-        .dor-frase.frase-visible {
-          opacity: 1;
-          transform: translateX(0);
-        }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(196, 170, 106, 0.2); border-radius: 2px; }
-
-        @media (max-width: 768px) {
-          .hero-tagline { font-size: clamp(34px, 8vw, 52px) !important; }
-          .hero-sub { font-size: 16px !important; }
+        @media (max-width: 640px) {
           .grid-modos { grid-template-columns: 1fr !important; }
-          .grid-steps { grid-template-columns: 1fr !important; }
-          .section-inner { padding: 0 24px !important; }
+          .hero-title { font-size: 36px !important; }
+          .passos-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
-      <main style={{ background: '#0d0f1a', minHeight: '100vh' }}>
-
-        {/* ══ SEÇÃO 1 — HERO ══ */}
-        <section
-          ref={heroRef}
-          style={{
-            height: '100vh',
-            minHeight: '600px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
+      {/* ── HEADER ── */}
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        padding: '20px 32px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        background: 'linear-gradient(to bottom, #0d0f1aee, transparent)',
+      }}>
+        <span style={{
+          fontFamily: 'Cormorant Garamond, serif',
+          fontStyle: 'italic',
+          fontWeight: 300,
+          fontSize: '22px',
+          color: '#e8d9a0',
+          letterSpacing: '0.02em',
+        }}>
+          Travessia
+        </span>
+        <a href="/login" style={{
+          fontFamily: 'DM Sans, sans-serif',
+          fontSize: '13px',
+          color: '#888',
+          textDecoration: 'none',
+          letterSpacing: '0.06em',
+          transition: 'color 0.2s',
+        }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#e8d9a0')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#888')}
         >
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to bottom, #080a12 0%, #0d0f1a 45%, #0a1a1a 100%)',
-          }} />
+          Entrar
+        </a>
+      </header>
 
-          {/* Lua */}
-          <div style={{
-            position: 'absolute',
-            top: '12%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '90px',
-            height: '90px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle at 40% 38%, #f0e4b2, #e8d9a0 40%, #c4aa6a)',
-            animation: 'float 6s ease-in-out infinite',
-            zIndex: 2,
-          }}>
-            <div style={{
-              position: 'absolute',
-              inset: '-20px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(232,217,160,0.18) 0%, transparent 70%)',
-              animation: 'glow 4s ease-in-out infinite',
-            }} />
-          </div>
-
-          {/* Reflexo */}
-          <div style={{
-            position: 'absolute',
-            bottom: '15%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '3px',
-            height: '200px',
-            background: 'linear-gradient(to bottom, rgba(196,170,106,0.7), rgba(196,170,106,0.1), transparent)',
-            filter: 'blur(2px)',
-            animation: 'ripple 3s ease-in-out infinite',
-            zIndex: 1,
-          }} />
-          <div style={{
-            position: 'absolute',
-            bottom: '20%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '60px',
-            height: '80px',
-            background: 'radial-gradient(ellipse, rgba(196,170,106,0.12) 0%, transparent 70%)',
-            animation: 'ripple 3.5s ease-in-out infinite',
-            zIndex: 1,
-          }} />
-
-          {/* Silhueta */}
-          <div style={{
-            position: 'absolute',
-            bottom: '18%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 3,
-          }}>
-            <svg width="28" height="72" viewBox="0 0 28 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="14" cy="7" rx="5.5" ry="6" fill="#050608"/>
-              <path d="M8 13 C6 20 5 32 6 44 L10 44 L10 36 L14 38 L18 36 L18 44 L22 44 C23 32 22 20 20 13 Z" fill="#050608"/>
-              <path d="M10 44 L8 65 L12 65 L14 52 L16 65 L20 65 L18 44 Z" fill="#050608"/>
-            </svg>
-          </div>
-
-          {/* Partículas */}
-          {[...Array(6)].map((_, i) => (
-            <div key={i} style={{
-              position: 'absolute',
-              bottom: `${22 + i * 4}%`,
-              left: `${46 + (i % 3) * 3}%`,
-              width: '2px',
-              height: '2px',
-              borderRadius: '50%',
-              background: '#c4aa6a',
-              opacity: 0,
-              '--drift': `${(i % 2 === 0 ? 1 : -1) * (8 + i * 4)}px`,
-              animation: `particleRise ${2.5 + i * 0.4}s ease-out ${i * 0.6}s infinite`,
-            } as React.CSSProperties} />
-          ))}
-
-          {/* Horizonte */}
-          <div style={{
-            position: 'absolute',
-            bottom: '24%',
-            left: 0,
-            right: 0,
-            height: '1px',
-            background: 'linear-gradient(to right, transparent, rgba(196,170,106,0.12), transparent)',
-          }} />
-
-          {/* Texto */}
-          <div style={{
-            position: 'relative',
-            zIndex: 10,
-            textAlign: 'center',
-            padding: '0 24px',
-            opacity: visible ? 1 : 0,
-            transition: 'opacity 0.6s ease',
-          }}>
-            <h1
-              className="hero-tagline"
-              style={{
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                fontSize: 'clamp(38px, 6vw, 68px)',
-                fontWeight: 300,
-                fontStyle: 'italic',
-                color: '#e8d9a0',
-                lineHeight: 1.2,
-                letterSpacing: '-0.01em',
-                marginBottom: '24px',
-                animation: visible ? 'taglineFade 1s ease forwards' : 'none',
-                animationDelay: '0.2s',
-                opacity: 0,
-              }}
-            >
-              Quando você perdeu<br />a si mesmo?
-            </h1>
-
-            <p
-              className="hero-sub"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '18px',
-                fontWeight: 300,
-                color: '#e8d9a0',
-                lineHeight: 1.7,
-                maxWidth: '440px',
-                margin: '0 auto 40px',
-                animation: visible ? 'subtitleFade 1s ease forwards' : 'none',
-                animationDelay: '0.6s',
-                opacity: 0,
-              }}
-            >
-              Não te falta foco.<br />Te falta contato com quem você é.
-            </p>
-
-            <div style={{
-              animation: visible ? 'ctaFade 1s ease forwards' : 'none',
-              animationDelay: '1s',
-              opacity: 0,
-            }}>
-              <button className="cta-btn" onClick={() => router.push('/login')}>
-                Começar minha travessia
-              </button>
-              <p style={{
-                marginTop: '16px',
-                fontSize: '13px',
-                color: 'rgba(232, 217, 160, 0.4)',
-                fontFamily: "'DM Sans', sans-serif",
-                letterSpacing: '0.04em',
-              }}>
-                Nenhum compromisso. Só você.
-              </p>
-            </div>
-          </div>
-
-          {/* Scroll hint */}
-          <div style={{
-            position: 'absolute',
-            bottom: '32px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            opacity: 0.3,
-            animation: visible ? 'ctaFade 1s ease forwards' : 'none',
-            animationDelay: '1.8s',
-          }}>
-            <div style={{
-              width: '1px',
-              height: '40px',
-              background: 'linear-gradient(to bottom, transparent, #c4aa6a)',
-              animation: 'float 2s ease-in-out infinite',
-            }} />
-          </div>
-        </section>
-
-        {/* ══ SEÇÃO 2 — DOR ══ */}
-        <section
-          ref={section2Ref}
-          className="section-fade"
-          style={{
-            padding: 'clamp(80px, 12vh, 140px) 0',
-            maxWidth: '720px',
-            margin: '0 auto',
-          }}
-        >
-          <div className="section-inner" style={{ padding: '0 40px' }}>
-            <DorFrase delay={0}>
-              Você estava lá. Mas não estava.
-            </DorFrase>
-            <DorFrase delay={150}>
-              Você não sabe o que está evitando. Sabe só que está evitando.
-            </DorFrase>
-            <DorFrase delay={300}>
-              Você consegue tudo que precisava. E ainda assim.
-            </DorFrase>
-            <DorFrase delay={450}>
-              Você passou tanto tempo sendo quem precisavam que esqueceu quem é.
-            </DorFrase>
-            <DorFrase delay={600}>
-              E se o problema não for você — mas o que você ainda não sabe sobre você?
-            </DorFrase>
-          </div>
-        </section>
-
-        {/* Divisor */}
+      {/* ── SEÇÃO 1: HERO ── */}
+      <section style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '120px 24px 80px',
+        textAlign: 'center',
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 1s ease',
+      }}>
+        {/* linha decorativa superior */}
         <div style={{
-          width: '1px', height: '80px',
-          background: 'linear-gradient(to bottom, transparent, rgba(196,170,106,0.2), transparent)',
-          margin: '0 auto',
+          width: '1px',
+          height: '60px',
+          background: 'linear-gradient(to bottom, transparent, #c4aa6a44)',
+          marginBottom: '48px',
         }} />
 
-        {/* ══ SEÇÃO 3 — O QUE É ══ */}
-        <section
-          ref={section3Ref}
-          className="section-fade"
-          style={{
-            padding: 'clamp(80px, 12vh, 140px) 0',
-            maxWidth: '800px',
-            margin: '0 auto',
-            textAlign: 'center',
-          }}
-        >
-          <div className="section-inner" style={{ padding: '0 40px' }}>
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '13px',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: '#c4aa6a',
-              marginBottom: '32px',
-            }}>
-              O que é a Travessia
-            </p>
+        <h1 className="hero-title" style={{
+          fontFamily: 'Cormorant Garamond, serif',
+          fontStyle: 'italic',
+          fontWeight: 300,
+          fontSize: '46px',
+          lineHeight: '1.25',
+          color: '#e8d9a0',
+          letterSpacing: '0.01em',
+          maxWidth: '600px',
+          marginBottom: '28px',
+        }}>
+          Quando foi a última vez que você falou sobre o que realmente está carregando?
+        </h1>
 
-            <h2 style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 'clamp(28px, 4vw, 44px)',
-              fontWeight: 300,
-              fontStyle: 'italic',
-              color: '#e8d9a0',
-              lineHeight: 1.4,
-              marginBottom: '32px',
-            }}>
-              Você não precisa de mais respostas.<br />Precisa das perguntas certas.
-            </h2>
+        <p style={{
+          fontFamily: 'DM Sans, sans-serif',
+          fontWeight: 300,
+          fontSize: '17px',
+          lineHeight: '1.75',
+          color: '#888',
+          maxWidth: '420px',
+          marginBottom: '44px',
+        }}>
+          Nem tudo precisa de conselho. Nem tudo precisa de solução.
+          <br />
+          Às vezes você só precisa de um espaço para colocar em palavras
+          aquilo que está preso há tempo demais.
+        </p>
 
-            <p style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 'clamp(18px, 2vw, 22px)',
-              fontWeight: 300,
-              fontStyle: 'italic',
-              color: 'rgba(232, 217, 160, 0.7)',
-              lineHeight: 1.8,
-              maxWidth: '560px',
-              margin: '0 auto 60px',
-            }}>
-              Existe um pensamento que você pensa há anos<br />
-              mas ainda não colocou em palavras.<br />
-              <br />
-              A Travessia começa onde você parou de perguntar.
-            </p>
+        <a href="/login" className="cta-btn">
+          Começar minha travessia
+        </a>
 
-            {/* Cards dos modos */}
-            <div className="grid-modos" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '16px',
-              textAlign: 'left',
-            }}>
-              {[
-                { icone: '≡', nome: 'Explorar', desc: 'Por que você reage assim — mesmo quando não quer?' },
-                { icone: '∞', nome: 'Integrar', desc: 'A versão de você que você ainda não apresentou a ninguém.' },
-                { icone: '~', nome: 'Origem',   desc: 'Quando você começou a ser quem os outros precisavam?' },
-                { icone: '⊙', nome: 'Sentido',  desc: 'O que você está construindo — e se vale o que está custando.' },
-              ].map((m, i) => (
-                <div key={i} className="modo-card">
-                  <div style={{
-                    fontFamily: 'monospace',
-                    fontSize: '20px',
-                    color: '#c4aa6a',
-                    marginBottom: '12px',
-                  }}>{m.icone}</div>
-                  <div style={{
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    fontSize: '20px',
-                    fontWeight: 400,
-                    color: '#e8d9a0',
-                    marginBottom: '10px',
-                  }}>{m.nome}</div>
-                  <div style={{
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    fontSize: '15px',
-                    fontStyle: 'italic',
-                    fontWeight: 300,
-                    color: 'rgba(232, 217, 160, 0.55)',
-                    lineHeight: 1.6,
-                  }}>{m.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <p style={{
+          marginTop: '18px',
+          fontFamily: 'DM Sans, sans-serif',
+          fontSize: '13px',
+          color: '#555',
+          letterSpacing: '0.04em',
+        }}>
+          Nenhum compromisso. Só você.
+        </p>
 
-        {/* Divisor */}
+        {/* linha decorativa inferior */}
         <div style={{
-          width: '1px', height: '80px',
-          background: 'linear-gradient(to bottom, transparent, rgba(196,170,106,0.2), transparent)',
-          margin: '0 auto',
+          width: '1px',
+          height: '60px',
+          background: 'linear-gradient(to bottom, #c4aa6a44, transparent)',
+          marginTop: '72px',
         }} />
+      </section>
 
-        {/* ══ SEÇÃO 4 — COMO FUNCIONA ══ */}
-        <section
-          ref={section4Ref}
-          className="section-fade"
-          style={{
-            padding: 'clamp(80px, 12vh, 140px) 0',
-            maxWidth: '700px',
-            margin: '0 auto',
-          }}
-        >
-          <div className="section-inner" style={{ padding: '0 40px' }}>
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '13px',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: '#c4aa6a',
-              marginBottom: '48px',
-              textAlign: 'center',
-            }}>
-              Como funciona
-            </p>
+      {/* ── SEÇÃO 2: DOR ── */}
+      <section
+        ref={section2Ref}
+        className="section-fade"
+        style={{
+          padding: '100px 24px',
+          maxWidth: '560px',
+          margin: '0 auto',
+          textAlign: 'center',
+        }}
+      >
+        {dorFrases.map((frase, i) => (
+          <DorFrase key={i} texto={frase} delay={i * 180} />
+        ))}
+      </section>
 
-            <div className="grid-steps" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '32px',
-            }}>
-              {[
-                {
-                  n: '01',
-                  titulo: 'Você cria uma conta',
-                  desc: 'Em 30 segundos. Só email e nome.',
-                },
-                {
-                  n: '02',
-                  titulo: 'Escolhe por onde começar',
-                  desc: 'Cada modo é uma entrada diferente para a mesma travessia.',
-                },
-                {
-                  n: '03',
-                  titulo: 'A conversa começa',
-                  desc: 'Não tem resposta certa. Só tem honestidade.',
-                },
-                {
-                  n: '04',
-                  titulo: 'Algo se move',
-                  desc: 'Você não vai sair com uma solução. Vai sair sabendo algo que não sabia antes de entrar.',
-                },
-              ].map(s => (
-                <div key={s.n} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                  <div className="step-num">{s.n}</div>
-                  <div>
-                    <div style={{
-                      fontFamily: "'Cormorant Garamond', Georgia, serif",
-                      fontSize: '18px',
-                      color: '#e8d9a0',
-                      marginBottom: '8px',
-                      fontWeight: 400,
-                    }}>{s.titulo}</div>
-                    <div style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '14px',
-                      fontWeight: 300,
-                      color: 'rgba(232, 217, 160, 0.45)',
-                      lineHeight: 1.7,
-                    }}>{s.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+      {/* ── SEÇÃO 3: O QUE É ── */}
+      <section
+        ref={section3Ref}
+        className="section-fade"
+        style={{
+          padding: '100px 24px',
+          maxWidth: '760px',
+          margin: '0 auto',
+        }}
+      >
+        <p style={{
+          fontFamily: 'DM Sans, sans-serif',
+          fontSize: '11px',
+          letterSpacing: '0.14em',
+          color: '#c4aa6a',
+          textTransform: 'uppercase',
+          marginBottom: '24px',
+          textAlign: 'center',
+        }}>
+          O que é a Travessia
+        </p>
 
-        {/* ══ SEÇÃO 5 — CTA FINAL ══ */}
-        <section
-          ref={section5Ref}
-          className="section-fade"
-          style={{
-            padding: 'clamp(100px, 16vh, 180px) 0',
-            textAlign: 'center',
-            position: 'relative',
-          }}
-        >
-          <div style={{
-            position: 'absolute',
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '600px', height: '300px',
-            background: 'radial-gradient(ellipse, rgba(196,170,106,0.06) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
+        <h2 style={{
+          fontFamily: 'Cormorant Garamond, serif',
+          fontStyle: 'italic',
+          fontWeight: 300,
+          fontSize: '34px',
+          lineHeight: '1.35',
+          color: '#e8d9a0',
+          textAlign: 'center',
+          marginBottom: '32px',
+        }}>
+          A Travessia é um espaço de conversa guiada para quem precisa organizar pensamentos, sentimentos e perguntas difíceis.
+        </h2>
 
-          <div style={{ position: 'relative', zIndex: 1, padding: '0 24px' }}>
-            <h2 style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 'clamp(32px, 5vw, 56px)',
-              fontWeight: 300,
-              fontStyle: 'italic',
-              color: '#e8d9a0',
-              lineHeight: 1.3,
-              marginBottom: '20px',
-            }}>
-              A primeira travessia<br />é gratuita.
-            </h2>
+        <p style={{
+          fontFamily: 'DM Sans, sans-serif',
+          fontWeight: 300,
+          fontSize: '16px',
+          lineHeight: '1.85',
+          color: '#777',
+          textAlign: 'center',
+          maxWidth: '500px',
+          margin: '0 auto 64px',
+        }}>
+          Sem julgamentos.
+          <br />Sem precisar saber por onde começar.
+          <br />Sem precisar ter todas as respostas.
+          <br /><br />
+          Você entra com o que está carregando.
+          <br />A conversa ajuda você a enxergar com mais clareza.
+        </p>
 
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '16px',
-              fontWeight: 300,
-              color: 'rgba(232, 217, 160, 0.45)',
-              marginBottom: '48px',
-              lineHeight: 1.7,
-            }}>
-              Você entra quando quiser. Sai quando quiser.<br />Fica se fizer sentido.
-            </p>
+        <p style={{
+          fontFamily: 'DM Sans, sans-serif',
+          fontSize: '12px',
+          letterSpacing: '0.1em',
+          color: '#555',
+          textTransform: 'uppercase',
+          textAlign: 'center',
+          marginBottom: '32px',
+        }}>
+          Você pode começar por diferentes caminhos
+        </p>
 
-            <button className="cta-btn" onClick={() => router.push('/login')}>
-              Entrar na travessia
-            </button>
-
-            <p style={{
-              marginTop: '20px',
-              fontSize: '12px',
-              color: 'rgba(232, 217, 160, 0.25)',
-              fontFamily: "'DM Sans', sans-serif",
-              letterSpacing: '0.04em',
-            }}>
-              Este não é um serviço de saúde mental. É uma ferramenta de autoconhecimento.
-            </p>
-          </div>
-        </section>
-
-        {/* ══ FOOTER ══ */}
-        <footer style={{
-          borderTop: '1px solid rgba(196, 170, 106, 0.08)',
-          padding: '32px 40px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
+        <div className="grid-modos" style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
           gap: '16px',
         }}>
-          <span style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: '18px',
-            fontStyle: 'italic',
-            color: 'rgba(232, 217, 160, 0.3)',
-          }}>
-            Travessia
-          </span>
-          <div style={{ display: 'flex', gap: '32px' }}>
-            <a href="/privacidade" style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '13px',
-              color: 'rgba(232, 217, 160, 0.3)',
+          {modos.map((m, i) => (
+            <div key={i} className="modo-card">
+              <div style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                fontSize: '22px',
+                color: '#c4aa6a',
+                marginBottom: '12px',
+              }}>
+                {m.icone}
+              </div>
+              <div style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                fontWeight: 400,
+                color: '#e8d9a0',
+                letterSpacing: '0.02em',
+                marginBottom: '8px',
+              }}>
+                {m.nome}
+              </div>
+              <div style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontWeight: 300,
+                fontSize: '13px',
+                color: '#666',
+                lineHeight: '1.6',
+              }}>
+                {m.descricao}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SEÇÃO 4: COMO FUNCIONA ── */}
+      <section
+        ref={section4Ref}
+        className="section-fade"
+        style={{
+          padding: '100px 24px',
+          maxWidth: '760px',
+          margin: '0 auto',
+        }}
+      >
+        <p style={{
+          fontFamily: 'DM Sans, sans-serif',
+          fontSize: '11px',
+          letterSpacing: '0.14em',
+          color: '#c4aa6a',
+          textTransform: 'uppercase',
+          marginBottom: '56px',
+          textAlign: 'center',
+        }}>
+          Como funciona
+        </p>
+
+        <div className="passos-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '40px 48px',
+        }}>
+          {[
+            { num: '01', titulo: 'Crie sua conta', desc: 'Leva menos de um minuto.' },
+            { num: '02', titulo: 'Escolha um caminho', desc: 'Cada conversa começa de um lugar diferente.' },
+            { num: '03', titulo: 'Comece a falar', desc: 'Sem respostas certas. Sem roteiro.' },
+            { num: '04', titulo: 'Ganhe clareza', desc: 'Você não precisa sair com uma solução. Só precisa sair vendo algo que não via antes.' },
+          ].map((p, i) => (
+            <div key={i}>
+              <div style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                fontStyle: 'italic',
+                fontSize: '13px',
+                color: '#c4aa6a',
+                letterSpacing: '0.08em',
+                marginBottom: '10px',
+              }}>
+                {p.num}
+              </div>
+              <div style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '15px',
+                fontWeight: 400,
+                color: '#e8d9a0',
+                marginBottom: '8px',
+              }}>
+                {p.titulo}
+              </div>
+              <div style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontWeight: 300,
+                fontSize: '14px',
+                color: '#666',
+                lineHeight: '1.7',
+              }}>
+                {p.desc}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SEÇÃO 5: CTA FINAL ── */}
+      <section
+        ref={section5Ref}
+        className="section-fade"
+        style={{
+          padding: '100px 24px 140px',
+          textAlign: 'center',
+          maxWidth: '560px',
+          margin: '0 auto',
+        }}
+      >
+        {/* divisor */}
+        <div style={{
+          width: '40px',
+          height: '1px',
+          background: '#1a1f35',
+          margin: '0 auto 64px',
+        }} />
+
+        <h2 style={{
+          fontFamily: 'Cormorant Garamond, serif',
+          fontStyle: 'italic',
+          fontWeight: 300,
+          fontSize: '38px',
+          lineHeight: '1.3',
+          color: '#e8d9a0',
+          marginBottom: '20px',
+        }}>
+          A primeira travessia é gratuita.
+        </h2>
+
+        <p style={{
+          fontFamily: 'DM Sans, sans-serif',
+          fontWeight: 300,
+          fontSize: '15px',
+          color: '#666',
+          marginBottom: '44px',
+          lineHeight: '1.7',
+        }}>
+          Você entra quando quiser. Sai quando quiser. Continua se fizer sentido.
+        </p>
+
+        <a href="/login" className="cta-btn">
+          Entrar na travessia
+        </a>
+
+        <p style={{
+          marginTop: '32px',
+          fontFamily: 'DM Sans, sans-serif',
+          fontSize: '11px',
+          color: '#444',
+          letterSpacing: '0.04em',
+          lineHeight: '1.6',
+        }}>
+          A Travessia não substitui atendimento psicológico ou psiquiátrico.
+          <br />É uma ferramenta de reflexão e autoconhecimento.
+        </p>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer style={{
+        borderTop: '1px solid #1a1f35',
+        padding: '28px 32px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '12px',
+      }}>
+        <span style={{
+          fontFamily: 'Cormorant Garamond, serif',
+          fontStyle: 'italic',
+          fontWeight: 300,
+          fontSize: '16px',
+          color: '#444',
+        }}>
+          Travessia
+        </span>
+
+        <div style={{ display: 'flex', gap: '24px' }}>
+          {[
+            { label: 'Privacidade', href: '/privacidade' },
+            { label: 'Entrar', href: '/login' },
+          ].map(link => (
+            <a key={link.href} href={link.href} style={{
+              fontFamily: 'DM Sans, sans-serif',
+              fontSize: '12px',
+              color: '#444',
               textDecoration: 'none',
               letterSpacing: '0.04em',
-              transition: 'color 0.2s ease',
+              transition: 'color 0.2s',
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.7)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.3)')}>
-              Privacidade
+              onMouseEnter={e => (e.currentTarget.style.color = '#888')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#444')}
+            >
+              {link.label}
             </a>
-            <a href="/login" style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '13px',
-              color: 'rgba(232, 217, 160, 0.3)',
-              textDecoration: 'none',
-              letterSpacing: '0.04em',
-              transition: 'color 0.2s ease',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.7)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,217,160,0.3)')}>
-              Entrar
-            </a>
-          </div>
-          <span style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '12px',
-            color: 'rgba(232, 217, 160, 0.2)',
-            letterSpacing: '0.04em',
-          }}>
-            © 2026 Travessia
-          </span>
-        </footer>
-      </main>
+          ))}
+        </div>
+
+        <span style={{
+          fontFamily: 'DM Sans, sans-serif',
+          fontSize: '11px',
+          color: '#333',
+          letterSpacing: '0.04em',
+        }}>
+          © 2026 Travessia
+        </span>
+      </footer>
     </>
   )
 }
 
-function DorFrase({ children, delay }: { children: React.ReactNode; delay: number }) {
-  const ref = useRef<HTMLDivElement>(null)
+/* ── Componente interno: DorFrase com IntersectionObserver ── */
+function DorFrase({ texto, delay }: { texto: string; delay: number }) {
+  const ref = useRef<HTMLParagraphElement>(null)
 
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && ref.current) {
+        if (entry.isIntersecting) {
           setTimeout(() => {
-            ref.current?.classList.add('frase-visible')
+            el.classList.add('frase-visible')
           }, delay)
+          observer.disconnect()
         }
       },
-      { threshold: 0.4 }
+      { threshold: 0.3 }
     )
-    if (ref.current) observer.observe(ref.current)
+    observer.observe(el)
     return () => observer.disconnect()
   }, [delay])
 
   return (
-    <div ref={ref} className="dor-frase">
-      {children}
-    </div>
+    <p
+      ref={ref}
+      className="dor-frase"
+      style={{
+        fontFamily: 'Cormorant Garamond, serif',
+        fontStyle: 'italic',
+        fontWeight: 300,
+        fontSize: '24px',
+        lineHeight: '1.55',
+        color: '#e8d9a0',
+        marginBottom: '36px',
+        letterSpacing: '0.01em',
+      }}
+    >
+      {texto}
+    </p>
   )
 }
