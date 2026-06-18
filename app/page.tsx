@@ -8,6 +8,7 @@ export default function LandingPage() {
   const router = useRouter()
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [visible, setVisible] = useState(false)
+  const [menuMobileAberto, setMenuMobileAberto] = useState(false)
 
   const section2Ref = useRef<HTMLElement>(null)
   const section3Ref = useRef<HTMLElement>(null)
@@ -252,6 +253,7 @@ export default function LandingPage() {
         @media (max-width: 640px) {
           .hero-title { font-size: 34px !important; }
           .nav-links-desktop { display: none !important; }
+          .nav-hamburguer { display: flex !important; }
           .footer-inner { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
           .footer-links-grupo { flex-wrap: wrap !important; }
         }
@@ -264,7 +266,7 @@ export default function LandingPage() {
         left: 0,
         right: 0,
         zIndex: 50,
-        padding: '18px 32px',
+        padding: '18px 24px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -282,7 +284,7 @@ export default function LandingPage() {
           Travessia
         </span>
 
-        {/* Botões direita */}
+        {/* Botões direita — desktop */}
         <div className="nav-links-desktop" style={{
           display: 'flex',
           alignItems: 'center',
@@ -292,7 +294,100 @@ export default function LandingPage() {
           <span className="nav-link" style={{ cursor: 'default', opacity: 0.5 }}>Para profissionais</span>
           <a href="/login" className="nav-cta">Voltar à minha Travessia</a>
         </div>
+
+        {/* Hambúrguer — mobile */}
+        <button
+          className="nav-hamburguer"
+          onClick={() => setMenuMobileAberto(!menuMobileAberto)}
+          style={{
+            display: 'none',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '4px',
+            flexDirection: 'column',
+            gap: '5px',
+          }}
+          aria-label="Menu"
+        >
+          <span style={{ display: 'block', width: '22px', height: '1.5px', background: menuMobileAberto ? 'transparent' : '#e8d9a0', transition: 'all 0.2s' }} />
+          <span style={{ display: 'block', width: '22px', height: '1.5px', background: '#e8d9a0', transition: 'all 0.2s', transform: menuMobileAberto ? 'rotate(45deg) translateY(6px)' : 'none' }} />
+          <span style={{ display: 'block', width: '22px', height: '1.5px', background: '#e8d9a0', transition: 'all 0.2s', transform: menuMobileAberto ? 'rotate(-45deg) translateY(-6px)' : 'none' }} />
+        </button>
       </header>
+
+      {/* ── MENU MOBILE DRAWER ── */}
+      {menuMobileAberto && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#0d0f1a',
+            zIndex: 40,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '40px',
+          }}
+        >
+          <span style={{
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: '20px',
+            color: '#555',
+            letterSpacing: '0.04em',
+            cursor: 'default',
+          }}>
+            Sobre
+          </span>
+          <span style={{
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: '20px',
+            color: '#555',
+            letterSpacing: '0.04em',
+            cursor: 'default',
+          }}>
+            Para profissionais
+          </span>
+          <a
+            href="/login"
+            style={{
+              fontFamily: 'DM Sans, sans-serif',
+              fontSize: '18px',
+              fontWeight: 500,
+              color: '#0d0f1a',
+              background: '#e8d9a0',
+              textDecoration: 'none',
+              padding: '14px 36px',
+              borderRadius: '6px',
+              letterSpacing: '0.04em',
+            }}
+          >
+            Voltar à minha Travessia
+          </a>
+
+          {/* Fechar */}
+          <button
+            onClick={() => setMenuMobileAberto(false)}
+            style={{
+              position: 'absolute',
+              top: '20px',
+              right: '24px',
+              background: 'none',
+              border: 'none',
+              color: '#e8d9a0',
+              fontSize: '28px',
+              cursor: 'pointer',
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* ── SEÇÃO 1: HERO ── */}
       <section style={{
